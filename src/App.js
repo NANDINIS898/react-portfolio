@@ -65,7 +65,7 @@ function App() {
         <h2>Projects</h2>
         <div className="project-grid">
           <div className="project-card">
-            <img src={insightcvimg} controls muted loop className="project-img" />
+            <img src={insightcvimg} controls muted loop className="project-img" alt="insightcv" />
             <h3>InsightCV</h3>
             <p>AI-powered resume reviewer with job-fit score predictions using GenAI.</p>
             <p className="tech">Python · TensorFlow · Hugging Face · Streamlit</p>
@@ -74,7 +74,7 @@ function App() {
           </div>
 
           <div className="project-card">
-            <img src={eventeaseImg} alt="EventEase Chatbot" />
+            <img src={eventeaseImg} alt="EventEase Chatbot"/>
             <h3>EventEase Chatbot</h3>
             <p>GenAI-based event planner using LLMs and RAG for college societies.</p>
             <p className="tech">Python · LangChain · Streamlit · ChromaDB</p>
@@ -82,7 +82,7 @@ function App() {
           </div>
 
           <div className="project-card">
-            <img src={moviematevid} controls muted loop className="project-img" />
+            <img src={moviematevid} controls muted loop className="project-img" alt="Mymoviemate" />
             <h3>My Movie Mate</h3>
             <p>Movie recommender web app with mood playlists and favorites.</p>
             <p className="tech">ReactJS · Node.js · MySQL · TMDB API</p>
