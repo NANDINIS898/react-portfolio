@@ -1,9 +1,9 @@
 import React from "react";
 import "./App.css";
 import profileImage from "./nandini.jpeg";
-import insightcvvid from "./Insightcv.mp4";
+import insightcvimg from "./Insightcv.png";
 import eventeaseImg from "./eventease.png";
-import moviematevid from "./mymoviemate.mp4";
+import moviematevid from "./mymoviemate.png";
 import budgetwiseImg from "./budgetwise.png";
 import tensorflowCert from "./deeplearning.png";
 import genaiCert from "./genai_simulation.png";
@@ -65,11 +65,12 @@ function App() {
         <h2>Projects</h2>
         <div className="project-grid">
           <div className="project-card">
-            <video src={insightcvvid} controls muted loop className="project-video" />
+            <img src={insightcvimg} controls muted loop className="project-img" />
             <h3>InsightCV</h3>
             <p>AI-powered resume reviewer with job-fit score predictions using GenAI.</p>
             <p className="tech">Python · TensorFlow · Hugging Face · Streamlit</p>
-            <a href="https://github.com/NANDINIS898/InsightCV" target="_blank" rel="noreferrer">View Code</a>
+            <a href="https://github.com/NANDINIS898/InsightCV" target="_blank" rel="noreferrer">View Code</a> 
+            <a href="https://www.linkedin.com/posts/nandini-gangwar-b47987213_machinelearning-genai-insightcv-activity-7355537261058310146-pP1A?utm_source=share&utm_medium=member_desktop&rcm=ACoAADYSWacBUqYf62UH3PN7Oc3oda9TGYrJtNw" target= "_blank" rel="noreferrer">Demo link</a>
           </div>
 
           <div className="project-card">
@@ -81,11 +82,12 @@ function App() {
           </div>
 
           <div className="project-card">
-            <video src={moviematevid} controls muted loop className="project-video" />
+            <img src={moviematevid} controls muted loop className="project-img" />
             <h3>My Movie Mate</h3>
             <p>Movie recommender web app with mood playlists and favorites.</p>
             <p className="tech">ReactJS · Node.js · MySQL · TMDB API</p>
             <a href="https://github.com/NANDINIS898/my-movie-mate" target="_blank" rel="noreferrer">View Code</a>
+             < a href="https://www.linkedin.com/posts/nandini-gangwar-b47987213_webdevelopment-reactjs-nodejs-activity-7284996649146347520-ib5X?utm_source=share&utm_medium=member_desktop&rcm=ACoAADYSWacBUqYf62UH3PN7Oc3oda9TGYrJtNw" target= "_blank" rel="noreferrer">Demo link</a>
           </div>
 
           <div className="project-card">
