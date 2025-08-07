@@ -94,7 +94,7 @@ function App() {
             <img src={budgetwiseImg} alt="BudgetWise" />
             <h3>BudgetWise</h3>
             <p>AI-powered Budget Tracker with category spend analysis and alerts.</p>
-            <p className="tech">ReactJS · Node.js · Express · Chart.js</p>
+            <p className="tech">Pandas, Numpy, Matplotlib, tkinter</p>
             <a href="https://github.com/NANDINIS898/budget-tracker-app" target="_blank" rel="noreferrer">View Code</a>
           </div>
         </div>
