@@ -40,8 +40,8 @@ function App() {
 
           </h1>
           <p>
-            <strong>AI Systems Engineer</strong> | GenAI | Agentic AI| MLOps
-Building scalable AI-powered decision systems| President @ E-Cell MSIT
+            <strong>AI Systems Engineer</strong> |specializing in decision intelligence & workflow automation|
+             Building scalable AI-powered decision systems| President @ E-Cell MSIT
           </p>
           <p>
             Passionate about building impactful AI applications using LLMs, RAG systems, and deep learning.
