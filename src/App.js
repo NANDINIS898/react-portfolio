@@ -40,12 +40,13 @@ function App() {
 
           </h1>
           <p>
-            <strong>GenAI, LLM & Data Science Enthusiast</strong> | AI/ML Developer | President @ E-Cell MSIT
+            <strong>AI Systems Engineer</strong> | GenAI | Agentic AI| MLOps
+Building scalable AI-powered decision systems| President @ E-Cell MSIT
           </p>
           <p>
             Passionate about building impactful AI applications using LLMs, RAG systems, and deep learning.
-            With experience in Python, TensorFlow, LangChain, and ReactJS, I bridge data and intelligence
-            to solve real-world problems.
+            With experience in Python, CrewAI, TensorFlow, LangChain, and ReactJS, I design, and scale AI systems with agents, 
+            fine-tuned LLMs, cost-aware routing, and cloud-native automation.
           </p>
           <div className="links">
             <a href="https://github.com/NANDINIS898" target="_blank" rel="noreferrer">
