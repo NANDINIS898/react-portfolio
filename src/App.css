@@ -274,6 +274,259 @@ a:hover {
   margin: 0.5rem 0;
 }
 
+/* === Capstones (featured) === */
+.capstones {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.capstones h2 {
+  font-size: 2.4rem;
+  margin-bottom: 2.5rem;
+  color: #f9d423;
+}
+
+.capstone {
+  max-width: 1200px;
+  margin: 0 auto 5rem;
+  padding: 2.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 78, 80, 0.08),
+    rgba(249, 212, 35, 0.05)
+  );
+  border: 1px solid rgba(255, 78, 80, 0.25);
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+  text-align: left;
+}
+
+.capstone-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.8rem;
+}
+
+.capstone-header h3 {
+  font-size: 2.2rem;
+  margin: 0;
+  color: #ffffff;
+}
+
+.capstone-tag {
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(249, 212, 35, 0.15);
+  color: #f9d423;
+  border: 1px solid rgba(249, 212, 35, 0.35);
+}
+
+.capstone-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #e6e6e6;
+  margin: 0 0 1.8rem;
+}
+
+.capstone .tech {
+  font-style: italic;
+  color: #bdbdbd;
+  margin-top: 1.2rem;
+}
+
+.capstone-links {
+  margin-top: 1rem;
+}
+
+.capstone-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #ff4e50;
+  margin-right: 1.2rem;
+}
+
+.capstone-links a:hover {
+  color: #f9d423;
+}
+
+/* --- Saarthi big video --- */
+.saarthi-video-wrap {
+  width: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 78, 80, 0.5);
+  box-shadow: 0 8px 30px rgba(255, 78, 80, 0.2);
+  background: #000;
+}
+
+.saarthi-video {
+  width: 100%;
+  height: auto;
+  max-height: 620px;
+  display: block;
+  object-fit: cover;
+}
+
+/* --- Puryopor screenshots with zoom + caption overlay --- */
+.puryopor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.4rem;
+  margin-top: 0.5rem;
+}
+
+.puryopor-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  aspect-ratio: 16 / 10;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.puryopor-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s ease, filter 0.4s ease;
+}
+
+.puryopor-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.2rem;
+  background: linear-gradient(
+    to top,
+    rgba(15, 32, 39, 0.95) 0%,
+    rgba(15, 32, 39, 0.7) 45%,
+    rgba(15, 32, 39, 0) 100%
+  );
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.puryopor-overlay h4 {
+  margin: 0 0 0.4rem;
+  color: #f9d423;
+  font-size: 1.15rem;
+}
+
+.puryopor-overlay p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #f1f1f1;
+}
+
+.puryopor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(255, 78, 80, 0.35);
+}
+
+.puryopor-card:hover img {
+  transform: scale(1.08);
+  filter: brightness(0.65);
+}
+
+.puryopor-card:hover .puryopor-overlay {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === Practice Projects (low-key list) === */
+.practice {
+  padding: 3rem 2rem 4rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.practice h2 {
+  font-size: 1.6rem;
+  color: #cfcfcf;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.practice-sub {
+  color: #9a9a9a;
+  font-size: 0.95rem;
+  margin: 0 0 1.5rem;
+}
+
+.practice-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.practice-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.1rem 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.25s ease;
+}
+
+.practice-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.practice-main h4 {
+  margin: 0 0 0.25rem;
+  color: #e6e6e6;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.practice-main p {
+  margin: 0 0 0.3rem;
+  color: #b5b5b5;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.practice-tech {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #8a8a8a;
+}
+
+.practice-repo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b5b5b5;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.practice-repo:hover {
+  color: #f9d423;
+  border-color: #f9d423;
+}
+
 /* === Responsive Tweaks === */
 @media (max-width: 768px) {
   .hero {
@@ -299,5 +552,30 @@ a:hover {
   .project-card img,
   .project-card video {
     height: 180px;
+  }
+
+  .capstone {
+    padding: 1.5rem;
+  }
+
+  .capstone-header h3 {
+    font-size: 1.6rem;
+  }
+
+  /* On touch devices show the overlay caption persistently */
+  .puryopor-overlay {
+    opacity: 1;
+    transform: translateY(0);
+    background: linear-gradient(
+      to top,
+      rgba(15, 32, 39, 0.92) 0%,
+      rgba(15, 32, 39, 0.5) 60%,
+      rgba(15, 32, 39, 0) 100%
+    );
+  }
+
+  .practice-item {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
