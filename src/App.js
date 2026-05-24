@@ -3,6 +3,9 @@ import "./App.css";
 import profileImage from "./nandini.jpeg";
 import tensorflowCert from "./deeplearning.png";
 import genaiCert from "./genai_simulation.png";
+import saarthiMainImg from "./saarthi-main.png";
+import pryoportDashboardImg from "./pryoport-dashboard.png";
+import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import { ReactTyped } from "react-typed";
 
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
@@ -12,17 +15,17 @@ import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 //   puryopor-report.png, puryopor-alerts.png, puryopor-history.png
 const puryoporShots = [
   {
-    src: "/pryoport-dashboard.png",
+    src: pryoportDashboardImg,
     title: "Dashboard",
-    desc: "Central view of purity scores, recent scans and trend graphs across all monitored products.",
+    desc: "Unified view of priority emails, recent activity and importance trends across the inbox.",
   },
   {
-    src: "/pryoport-extension.png",
+    src: "/pryoport-extension.png", // TODO: drop pryoport-extension.png into /public
     title: "Browser Extension",
-    desc: "One-click ingredient analysis on any e-commerce product page — verdict shown inline.",
+    desc: "One-click triage on any open email — priority verdict shown inline in the browser.",
   },
   {
-    src: "/pryoport-alerts.png",
+    src: "/pryoport-alerts.png", // TODO: drop pryoport-alerts.png into /public
     title: "Smart Alerts",
     desc: "Personalised warnings whenever an urgent or important email arrives, tuned to the user's priorities.",
   },
@@ -173,16 +176,12 @@ function App() {
           </p>
 
           <div className="saarthi-video-wrap">
-            {/* Drop your demo into /public/saarthi-demo.mp4 (and optional poster image) */}
-            <video
+            {/* Placeholder image until the Saarthi demo video is added */}
+            <img
               className="saarthi-video"
-              src="/saarthi-demo.mp4"
-              poster="/saarthi-poster.png"
-              controls
-              playsInline
-            >
-              Your browser does not support the video tag.
-            </video>
+              src={saarthiMainImg}
+              alt="Saarthi platform preview"
+            />
           </div>
 
           <p className="tech">Python · LangChain · LLMs · Speech I/O · ReactJS</p>
@@ -206,6 +205,17 @@ function App() {
             and intelligent alerting layer.
           </p>
 
+          <div className="pryoport-video-wrap">
+            <video
+              className="pryoport-video"
+              src={pryoportDemoVideo}
+              controls
+              playsInline
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
+
           <div className="pryoport-grid">
             {puryoporShots.map((shot) => (
               <div className="pryoport-card" key={shot.title}>
@@ -220,8 +230,11 @@ function App() {
 
           <p className="tech">Python · FastAPI · React · Chrome Extension · LLMs</p>
           <div className="capstone-links">
-            <a href="#" target="_blank" rel="noreferrer">
+            <a href="https://github.com/NANDINIS898/PRYOPORT" target="_blank" rel="noreferrer">
               <FaGithub /> View Code
+            </a>
+            <a href="https://pryoport-frontend.vercel.app/" target="_blank" rel="noreferrer">
+              🚀 Live Demo
             </a>
           </div>
         </div>
