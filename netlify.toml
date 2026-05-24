@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+[build.environment]
+  CI = "false"
+  NODE_VERSION = "18"
+
+# SPA fallback — every route serves index.html so React Router (if added later) works
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

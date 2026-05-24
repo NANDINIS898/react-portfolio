@@ -12,34 +12,63 @@ import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 //   puryopor-report.png, puryopor-alerts.png, puryopor-history.png
 const puryoporShots = [
   {
-    src: "/puryopor-dashboard.png",
+    src: "/pryoport-dashboard.png",
     title: "Dashboard",
     desc: "Central view of purity scores, recent scans and trend graphs across all monitored products.",
   },
   {
-    src: "/puryopor-extension.png",
+    src: "/pryoport-extension.png",
     title: "Browser Extension",
     desc: "One-click ingredient analysis on any e-commerce product page — verdict shown inline.",
   },
   {
-    src: "/puryopor-scan.png",
-    title: "Ingredient Scan",
-    desc: "OCR + LLM pipeline parses ingredient lists from labels and classifies each component.",
-  },
-  {
-    src: "/puryopor-report.png",
-    title: "Detailed Report",
-    desc: "Per-product breakdown of harmful additives, allergens and a transparent purity score.",
-  },
-  {
-    src: "/puryopor-alerts.png",
+    src: "/pryoport-alerts.png",
     title: "Smart Alerts",
-    desc: "Personalised warnings based on user health profile, allergies and dietary preferences.",
+    desc: "Personalised warnings whenever an urgent or important email arrives, tuned to the user's priorities.",
+  },
+];
+
+const techStack = [
+  {
+    title: "Programming Languages",
+    icon: "💻",
+    items: ["Python", "C++", "JavaScript", "SQL"],
   },
   {
-    src: "/puryopor-history.png",
-    title: "History & Insights",
-    desc: "Tracks consumption patterns over time and surfaces insights on overall product purity.",
+    title: "AI / ML & GenAI",
+    icon: "🤖",
+    items: [
+      "TensorFlow",
+      "Scikit-learn",
+      "XGBoost",
+      "LangChain",
+      "CrewAI",
+      "LangSmith",
+      "RAG Systems",
+      "SHAP",
+    ],
+  },
+  {
+    title: "Frameworks & Full Stack",
+    icon: "⚙️",
+    items: [
+      "ReactJS",
+      "Node.js",
+      "Express.js",
+      "FastAPI",
+      "REST APIs",
+      "Streamlit",
+    ],
+  },
+  {
+    title: "Databases",
+    icon: "🗄️",
+    items: ["MySQL", "PostgreSQL", "ChromaDB", "SQLite"],
+  },
+  {
+    title: "Tools & Infra",
+    icon: "🧠",
+    items: ["PyPDFLoader", "Git", "GitHub", "GitLab"],
   },
 ];
 
@@ -66,7 +95,7 @@ const practiceProjects = [
     name: "Nandini AI VoiceBot",
     desc: "Conversational voice assistant built on speech-to-text + LLM + TTS pipeline.",
     tech: "Python · Whisper · LLM APIs · gTTS",
-    repo: "#", // TODO: replace with actual repo URL
+    repo: "https://github.com/NANDINIS898/nandini-ai-voicebot-frontend", // TODO: replace with actual repo URL
   },
   {
     name: "BudgetWise",
@@ -85,6 +114,7 @@ function App() {
           <li><a href="#about">About</a></li>
           <li><a href="#capstones">Capstones</a></li>
           <li><a href="#practice">Practice</a></li>
+          <li><a href="#tech-stack">Tech Stack</a></li>
           <li><a href="#achievements">Achievements</a></li>
           <li><a href="#certifications">Certifications</a></li>
           <li><a href="#contact">Contact</a></li>
@@ -138,9 +168,8 @@ function App() {
             <span className="capstone-tag">Capstone · AI Companion</span>
           </div>
           <p className="capstone-desc">
-            Saarthi is an AI-driven companion designed to guide users through personalised
-            journeys — combining LLM reasoning, voice interaction and contextual memory to
-            deliver an empathetic, conversational experience.
+            Saarthi is AI powered loan underwriting and Video onboarding platform. It 
+            replaces paper-and-form loan applications with a 5-minute conversational experience: a live video KYC session, an XGBoost risk model with SHAP explainability, industry-standard responsible-lending guardrails (FOIR, total exposure cap, concurrent-loan limit), and a multi-agent layer that negotiates the offer and issues the sanction letter: all guided by a voice-driven AI assistant.
           </p>
 
           <div className="saarthi-video-wrap">
@@ -158,29 +187,30 @@ function App() {
 
           <p className="tech">Python · LangChain · LLMs · Speech I/O · ReactJS</p>
           <div className="capstone-links">
-            <a href="#" target="_blank" rel="noreferrer">
+            <a href="https://github.com/NANDINIS898/saarthi-main" target="_blank" rel="noreferrer">
               <FaGithub /> View Code
             </a>
           </div>
         </div>
 
-        {/* --- PURYOPOR --- */}
-        <div className="capstone puryopor">
+        {/* --- PRYOPORT --- */}
+        <div className="capstone pryoport">
           <div className="capstone-header">
-            <h3>Puryopor</h3>
-            <span className="capstone-tag">Capstone · Purity Intelligence</span>
+            <h3>Pryoport</h3>
+            <span className="capstone-tag">Capstone · Smart Email Priority Engine</span>
           </div>
           <p className="capstone-desc">
-            Puryopor brings transparency to everyday products. A dashboard + browser extension
-            stack that analyses ingredient lists, flags harmful additives and produces an
-            easy-to-read purity score — powered by OCR and LLM-based ingredient classification.
+            An AI-powered system that ensures users never miss important emails or tasks.
+            Built to boost productivity, Pryoport delivers personalised notifications whenever
+            an urgent or high-priority mail arrives — combining a dashboard, browser extension
+            and intelligent alerting layer.
           </p>
 
-          <div className="puryopor-grid">
+          <div className="pryoport-grid">
             {puryoporShots.map((shot) => (
-              <div className="puryopor-card" key={shot.title}>
-                <img src={shot.src} alt={`Puryopor ${shot.title}`} />
-                <div className="puryopor-overlay">
+              <div className="pryoport-card" key={shot.title}>
+                <img src={shot.src} alt={`Pryoport ${shot.title}`} />
+                <div className="pryoport-overlay">
                   <h4>{shot.title}</h4>
                   <p>{shot.desc}</p>
                 </div>
@@ -188,12 +218,35 @@ function App() {
             ))}
           </div>
 
-          <p className="tech">Python · FastAPI · React · Chrome Extension · OCR · LLMs</p>
+          <p className="tech">Python · FastAPI · React · Chrome Extension · LLMs</p>
           <div className="capstone-links">
             <a href="#" target="_blank" rel="noreferrer">
               <FaGithub /> View Code
             </a>
           </div>
+        </div>
+      </section>
+
+      {/* === TECH STACK === */}
+      <section className="tech-stack" id="tech-stack">
+        <h2>My Tech Stack</h2>
+        <p className="tech-stack-sub">
+          The toolkit I reach for when designing, building and shipping AI systems.
+        </p>
+        <div className="tech-stack-grid">
+          {techStack.map((group) => (
+            <div className="tech-group" key={group.title}>
+              <h3>
+                <span className="tech-icon" aria-hidden="true">{group.icon}</span>
+                {group.title}
+              </h3>
+              <ul className="tech-chips">
+                {group.items.map((item) => (
+                  <li key={item} className="tech-chip">{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </section>
 

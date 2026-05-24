@@ -375,14 +375,14 @@ a:hover {
 }
 
 /* --- Puryopor screenshots with zoom + caption overlay --- */
-.puryopor-grid {
+.pryoport-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.4rem;
   margin-top: 0.5rem;
 }
 
-.puryopor-card {
+.pryoport-card {
   position: relative;
   border-radius: 14px;
   overflow: hidden;
@@ -393,7 +393,7 @@ a:hover {
   transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.puryopor-card img {
+.pryoport-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -401,7 +401,7 @@ a:hover {
   transition: transform 0.6s ease, filter 0.4s ease;
 }
 
-.puryopor-overlay {
+.pryoport-overlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -419,30 +419,30 @@ a:hover {
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.puryopor-overlay h4 {
+.pryoport-overlay h4 {
   margin: 0 0 0.4rem;
   color: #f9d423;
   font-size: 1.15rem;
 }
 
-.puryopor-overlay p {
+.pryoport-overlay p {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.45;
   color: #f1f1f1;
 }
 
-.puryopor-card:hover {
+.pryoport-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 30px rgba(255, 78, 80, 0.35);
 }
 
-.puryopor-card:hover img {
+.pryoport-card:hover img {
   transform: scale(1.08);
   filter: brightness(0.65);
 }
 
-.puryopor-card:hover .puryopor-overlay {
+.pryoport-card:hover .pryoport-overlay {
   opacity: 1;
   transform: translateY(0);
 }
@@ -527,6 +527,86 @@ a:hover {
   border-color: #f9d423;
 }
 
+/* === Tech Stack === */
+.tech-stack {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.tech-stack h2 {
+  font-size: 2.2rem;
+  color: #f9d423;
+  margin-bottom: 0.4rem;
+}
+
+.tech-stack-sub {
+  color: #b5b5b5;
+  font-size: 1rem;
+  margin: 0 0 2.5rem;
+}
+
+.tech-stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.tech-group {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 1.4rem 1.3rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tech-group:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 78, 80, 0.4);
+  box-shadow: 0 8px 24px rgba(255, 78, 80, 0.15);
+}
+
+.tech-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: #f9d423;
+  font-weight: 600;
+}
+
+.tech-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.tech-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tech-chip {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 78, 80, 0.12);
+  color: #f1f1f1;
+  border: 1px solid rgba(255, 78, 80, 0.25);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.tech-chip:hover {
+  background: rgba(249, 212, 35, 0.2);
+  color: #f9d423;
+}
+
 /* === Responsive Tweaks === */
 @media (max-width: 768px) {
   .hero {
@@ -563,7 +643,7 @@ a:hover {
   }
 
   /* On touch devices show the overlay caption persistently */
-  .puryopor-overlay {
+  .pryoport-overlay {
     opacity: 1;
     transform: translateY(0);
     background: linear-gradient(
