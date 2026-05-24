@@ -138,14 +138,12 @@ function App() {
             />
           </h1>
           <p>
-            <strong>AI Systems Engineer</strong> |specializing in decision intelligence & workflow automation|
-             Building scalable AI-powered decision systems| President @ E-Cell MSIT
+            <strong>AI Systems Engineer</strong> | Product Thinking |
+             Building scalable AI-driven solutions| President , eCell MSIT
           </p>
           <p>
-            Passionate about building impactful AI applications using LLMs, RAG systems, and deep learning.
-            With experience in Python, CrewAI, TensorFlow, LangChain, and ReactJS, I design, and scale AI systems with agents, 
-            fine-tuned LLMs, cost-aware routing, and cloud-native automation.
-          </p>
+            Passionate about building user-centric products that solve real everyday problems. I love combining product thinking with engineering to design intelligent, agent-driven systems that automate workflows, improve user experiences, and create meaningful real-world impact.
+            </p>
           <div className="links">
             <a href="https://github.com/NANDINIS898" target="_blank" rel="noreferrer">
               <FaGithub size={20} /> GitHub
@@ -168,7 +166,7 @@ function App() {
         <div className="capstone saarthi">
           <div className="capstone-header">
             <h3>Saarthi</h3>
-            <span className="capstone-tag">Capstone · AI Companion</span>
+            <span className="capstone-tag">Loan AI assistant</span>
           </div>
           <p className="capstone-desc">
             Saarthi is AI powered loan underwriting and Video onboarding platform. It 
@@ -184,7 +182,7 @@ function App() {
             />
           </div>
 
-          <p className="tech">Python · LangChain · LLMs · Speech I/O · ReactJS</p>
+          <p className="tech">Python · LangChain · ML Risk Prediction · Multi-agent systems · Speech I/O · ReactJS </p>
           <div className="capstone-links">
             <a href="https://github.com/NANDINIS898/saarthi-main" target="_blank" rel="noreferrer">
               <FaGithub /> View Code
@@ -196,7 +194,7 @@ function App() {
         <div className="capstone pryoport">
           <div className="capstone-header">
             <h3>Pryoport</h3>
-            <span className="capstone-tag">Capstone · Smart Email Priority Engine</span>
+            <span className="capstone-tag">Smart Email Priority Engine</span>
           </div>
           <p className="capstone-desc">
             An AI-powered system that ensures users never miss important emails or tasks.
@@ -228,7 +226,7 @@ function App() {
             ))}
           </div>
 
-          <p className="tech">Python · FastAPI · React · Chrome Extension · LLMs</p>
+          <p className="tech">Python · FastAPI · React · ML+ Agentic AI pipeline · Chrome Extension · Typescript </p>
           <div className="capstone-links">
             <a href="https://github.com/NANDINIS898/PRYOPORT" target="_blank" rel="noreferrer">
               <FaGithub /> View Code
