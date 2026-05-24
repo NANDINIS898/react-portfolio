@@ -7,6 +7,7 @@ import saarthiMainImg from "./saarthi-main.png";
 import pryoportDashboardImg from "./pryoport-dashboard.png";
 import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import { ReactTyped } from "react-typed";
+import FloatingCodeBg from "./FloatingCodeBg";
 
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 
@@ -35,14 +36,18 @@ const techStack = [
   {
     title: "Programming Languages",
     icon: "💻",
-    items: ["Python", "C++", "JavaScript", "SQL"],
+    items: ["Python", "C++", "JavaScript", "SQL", "TypeScript"],
   },
   {
     title: "AI / ML & GenAI",
     icon: "🤖",
     items: [
       "TensorFlow",
+      "Keras",
       "Scikit-learn",
+      "OpenCV",
+      "Numpy",
+      "pandas",
       "XGBoost",
       "LangChain",
       "CrewAI",
@@ -66,12 +71,12 @@ const techStack = [
   {
     title: "Databases",
     icon: "🗄️",
-    items: ["MySQL", "PostgreSQL", "ChromaDB", "SQLite"],
+    items: ["MySQL", "PostgreSQL", "ChromaDB", "SQLite", "Alembic"],
   },
   {
     title: "Tools & Infra",
     icon: "🧠",
-    items: ["PyPDFLoader", "Git", "GitHub", "GitLab"],
+    items: ["PyPDFLoader", "Git", "GitHub", "GitLab", "ReportLab", "HuggingFace"],
   },
 ];
 
@@ -111,6 +116,7 @@ const practiceProjects = [
 function App() {
   return (
     <div className="app">
+      <FloatingCodeBg count={32} />
       <nav className="navbar">
         <div className="nav-left">Nandini</div>
         <ul className="nav-links">
