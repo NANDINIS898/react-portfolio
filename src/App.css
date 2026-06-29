@@ -97,7 +97,14 @@ a{
       radial-gradient(circle at 80% 70%, rgba(95,184,221,0.12), transparent 30%),
       linear-gradient(180deg,#0c1119 0%,#070a10 60%,#04060a 100%);
 }
-
+.signature-name{
+  font-family: "Caveat", cursive;
+  font-size: clamp(70px, 12vw, 170px);
+  color: rgba(255,255,255,0.85);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 25px rgba(255,255,255,0.15);
+}
 .skyline{
   position:absolute;
   bottom:0;

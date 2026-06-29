@@ -86,7 +86,7 @@ function App() {
       {/* NAV */}
       <nav className="nav">
         <div className="nav-mark">
-          N.K<span>/ portfolio</span>
+          N.G<span>/ portfolio</span>
         </div>
 
         <div className="nav-links">
@@ -107,32 +107,10 @@ function App() {
         </div>
 
         <div className="signature-layer">
-          <svg
-            viewBox="0 0 600 220"
-            width="min(86vw,560px)"
-            style={{ overflow: "visible" }}
-          >
-            <path
-              ref={sigRef}
-              id="sigPath"
-              d="M30,150 C45,100 60,55 78,55 C96,55 100,110 95,150
-              C90,180 85,160 95,140 C115,100 130,70 138,70
-              C146,70 140,120 145,140 C148,152 158,140 165,118
-              L180,75 C175,110 172,140 178,148 C184,156 198,135 205,110
-              M225,150 L225,60 M210,60 L240,60
-              M255,150 C255,110 258,75 270,75 C282,75 282,115 270,140
-              C262,156 250,150 255,140
-              M300,150 L300,55 M300,55 L335,55 C350,55 350,90 335,90
-              L300,90 M320,90 L345,150
-              M365,150 C365,110 368,75 380,75 C392,75 392,115 380,140
-              C372,156 360,150 365,140
-              M410,150 L410,60
-              M430,150 C430,150 432,90 445,90 C458,90 446,150 458,150
-              C470,150 472,100 478,90
-              M495,150 L495,55 L520,150 L520,55"
-            />
-          </svg>
-        </div>
+  <h1 className="signature-name">Nandini G</h1>
+</div>
+
+        
 
         <canvas ref={canvasRef} id="fogCanvas"></canvas>
 
@@ -143,17 +121,17 @@ function App() {
 
         <div className="hero-copy">
           <div className="eyebrow">
-            AI Systems Engineer · President, E-Cell MSIT
+            AI Systems Engineer · President, eCell MSIT
           </div>
 
           <h1 className="hero-title">
             I build systems that <em>think,</em>
             <br />
-            then I make sure they're <em>correct.</em>
+            then I make sure they're <em>correct and scalable.</em>
           </h1>
 
           <p className="hero-sub">
-            Agent-driven products, loan intelligence, and AI automation —
+            Agent-driven products, loan intelligence, and AI automation
             engineered with product thinking and debugged until edge cases stop
             breaking.
           </p>
@@ -174,14 +152,14 @@ function App() {
           <div className="about-grid">
             <div className="about-text">
               <p>
-                I’m a B.Tech CS student focused on building AI systems that solve
+                I’m a B.Tech student (CGPA :9.00) focused on building AI systems that solve
                 real-world problems through product thinking and engineering.
               </p>
 
               <p>
                 Most of what I build sits at the intersection of{" "}
                 <strong>Generative AI, machine learning and systems design</strong>
-                — from multi-agent LLM pipelines to credit-risk intelligence.
+                - from multi-agent LLM pipelines to credit-risk intelligence.
               </p>
 
               <p>
@@ -198,12 +176,12 @@ function App() {
 
               <div className="stat">
                 <span className="stat-label">Major AI Projects</span>
-                <span className="stat-val">7+</span>
+                <span className="stat-val">2</span>
               </div>
 
               <div className="stat">
-                <span className="stat-label">Current Focus</span>
-                <span className="stat-val">GenAI</span>
+                <span className="stat-label">LeetCode</span>
+                <span className="stat-val">350+</span>
               </div>
 
               <div className="stat">
@@ -225,7 +203,7 @@ function App() {
           <div className="project">
             <div className="project-top">
               <span className="project-name">Saarthi</span>
-              <span className="project-tag">Loan AI Assistant</span>
+              <span className="project-tag">Loan AI Assistant with Video Based Onboarding</span>
             </div>
 
             <p className="project-desc">
@@ -242,12 +220,12 @@ function App() {
           <div className="project">
             <div className="project-top">
               <span className="project-name">Pryoport</span>
-              <span className="project-tag">Email Intelligence</span>
+              <span className="project-tag">Smart Email Priority Detection Engine</span>
             </div>
 
             <p className="project-desc">
               AI-powered email prioritisation system combining dashboard, browser
-              extension and alert engine.
+              extension and alert engine. Makes sure all your important tasks & deadlines are never missed or buried under spam.
             </p>
 
             <div className="capstone-media">
@@ -320,13 +298,13 @@ function App() {
 
           <div className="ach-grid">
             <div className="ach-card">
-              🏆 IIT Delhi TRYST 2025 — 3rd Place
+              🏆 IIT Delhi TRYST 2025 : 3rd Place
             </div>
             <div className="ach-card">
-              🏅 DTU CodeWithDCG — Special Mention
+              🏅 DTU CodeWithDCG : Special Mention
             </div>
             <div className="ach-card">
-              🥉 ABES Hacknovate 6.0 — 3rd Place
+              🥉 ABES Hacknovate 6.0 : 3rd Place
             </div>
           </div>
         </section>
@@ -390,7 +368,7 @@ function App() {
         </section>
       </main>
 
-      <footer>built by nandini · 2026</footer>
+      <footer>built by nandini G. · 2026</footer>
     </div>
   );
 }
