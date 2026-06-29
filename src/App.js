@@ -14,16 +14,6 @@ const puryoporShots = [
     title: "Dashboard",
     desc: "Unified view of priority emails and activity trends.",
   },
-  {
-    src: "/pryoport-extension.png",
-    title: "Browser Extension",
-    desc: "Inline email triage directly in browser.",
-  },
-  {
-    src: "/pryoport-alerts.png",
-    title: "Smart Alerts",
-    desc: "AI-powered priority notifications.",
-  },
 ];
 
 const techStack = [

@@ -121,15 +121,15 @@ a{
   background:linear-gradient(180deg,#131b26,#0a0f16);
   border-top:1px solid rgba(95,184,221,0.18);
 }
-
-.signature-layer{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
+.signature-layer {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
 }
+
 
 #sigPath{
   fill:none;
