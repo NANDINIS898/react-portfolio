@@ -98,7 +98,7 @@ a{
       linear-gradient(180deg,#0c1119 0%,#070a10 60%,#04060a 100%);
 }
 .signature-name{
-  font-family: "Caveat", cursive;
+  font-family:var(--accent-dim);
   font-size: clamp(70px, 12vw, 170px);
   color: rgba(255,255,255,0.85);
   font-weight: 700;
