@@ -8,13 +8,7 @@ import pryoportDashboardImg from "./pryoport-dashboard.png";
 import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import useFogEffect from "./useFogEffect";
 
-const puryoporShots = [
-  {
-    src: pryoportDashboardImg,
-    title: "Dashboard",
-    desc: "Unified view of priority emails and activity trends.",
-  },
-];
+
 
 const techStack = [
   "Python",
@@ -97,7 +91,7 @@ function App() {
         </div>
 
         <div className="signature-layer">
-  <h1 className="signature-name">Nandini G</h1>
+  <h1 className="signature-name">Nandini</h1>
 </div>
 
         
