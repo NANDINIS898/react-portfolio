@@ -134,12 +134,15 @@ function App() {
         {/* ABOUT */}
         <section className="section" id="about">
           <div className="section-head">
+            
             <span className="section-num">01</span>
             <span className="section-title">About</span>
             <span className="section-line"></span>
           </div>
 
+
           <div className="about-grid">
+            <div className="about-image"><img src={profileImage} alt="Nandini" /></div>
             <div className="about-text">
               <p>
                 I’m a B.Tech student (CGPA :9.00) focused on building AI systems that solve

@@ -244,6 +244,13 @@ a{
   height:1px;
   background:var(--line);
 }
+a, button {
+  transition: all 0.3s ease;
+}
+.nav-links a:hover {
+  color: #5fb8dd;
+  transform: translateY(-2px);
+}
 
 /* ABOUT */
 .about-grid{
@@ -257,7 +264,25 @@ a{
   line-height:1.8;
   color:var(--frost-dim);
 }
+.about-section {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+}
 
+.about-image img {
+  width: 280px;
+  height: 340px;
+  object-fit: cover;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.4s ease;
+}
+
+.about-image img:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 20px 50px rgba(95,184,221,0.25);
+}
 .stat{
   display:flex;
   justify-content:space-between;
