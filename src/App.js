@@ -219,18 +219,6 @@ function App() {
             <div className="capstone-media">
               <video src={pryoportDemoVideo} controls />
             </div>
-
-            <div className="shot-grid">
-              {puryoporShots.map((shot) => (
-                <div className="shot-card" key={shot.title}>
-                  <img src={shot.src} alt={shot.title} />
-                  <div className="shot-card-body">
-                    <h4>{shot.title}</h4>
-                    <p>{shot.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </section>
 
