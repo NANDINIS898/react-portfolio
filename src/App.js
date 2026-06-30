@@ -113,7 +113,7 @@ function App() {
           <h1 className="hero-title">
             I build systems that <em>think,</em>
             <br />
-            then I make sure they're <em>correct and scalable.</em>
+            then make sure they're <em>correct & scalable.</em>
           </h1>
 
           <p className="hero-sub">
@@ -200,6 +200,7 @@ function App() {
               XGBoost risk scoring, SHAP explainability, multi-agent negotiation,
               and voice-based onboarding.
             </p>
+            <link href="https://githum.com/NANDINIS898/saarthi-main" ></link>
 
             <div className="capstone-media">
               <img src={saarthiMainImg} alt="Saarthi" />
@@ -216,6 +217,7 @@ function App() {
               AI-powered email prioritisation system combining dashboard, browser
               extension and alert engine. Makes sure all your important tasks & deadlines are never missed or buried under spam.
             </p>
+            <link href="https://githum.com/NANDINIS898/pryoport" ></link>
 
             <div className="capstone-media">
               <video src={pryoportDemoVideo} controls />
