@@ -95,7 +95,7 @@ function App() {
         <div className="signature-layer">
   <h1 className="signature-name">Nandini Gangwar</h1>
   <div className="eyebrow">
-            AI Systems Engineer · President, eCell MSIT
+            Building Systems, one late-night debug at a time
           </div>
 </div>
 
