@@ -10,88 +10,8 @@
   --line:rgba(232,237,242,0.08);
 }
 
-/* ===== Cursive signature font for hero name ===== */
-@import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Allura&display=swap');
-
-.signature-name {
-  font-family: 'Allura', cursive;
-  font-size: 7rem;
-  font-weight: 400;
-  letter-spacing: 1px;
-  background: linear-gradient(135deg, #ffffff, #c9d8ff 60%, #9fb4ff);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 18px rgba(160, 180, 255, 0.35));
-  margin: 0;
-}
-
-@media (max-width: 768px) {
-  .signature-name {
-    font-size: 4rem;
-  }
-}
-
-/* ===== Global "reactive" hover zoom for interactive elements ===== */
-.about-image img,
-.capstone-media img,
-.capstone-media video,
-.cert-card img,
-.practice-item,
-.ach-card,
-.cert-card,
-.chip,
-.contact-link,
-.stat {
-  transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
-  will-change: transform;
-}
-
-.about-image:hover img,
-.capstone-media:hover img,
-.capstone-media:hover video {
-  transform: scale(1.04);
-}
-
-.cert-card:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-}
-
-.cert-card:hover img {
-  transform: scale(1.08);
-}
-
-.practice-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-}
-
-.ach-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-.chip:hover {
-  transform: scale(1.12);
-  filter: brightness(1.2);
-}
-
-.contact-link:hover {
-  transform: scale(1.08);
-}
-
-.stat:hover {
-  transform: scale(1.06);
-}
-
-.project {
-  transition: transform 0.35s ease;
-}
-
-.project:hover {
-  transform: scale(1.01);
-}
+/* ===== Fonts: cursive signature + mono utility ===== */
+@import url('https://fonts.googleapis.com/css2?family=Bonheur+Royale&family=Space+Mono:wght@400;700&display=swap');
 
 *{
   margin:0;
@@ -117,6 +37,10 @@ body{
 a{
   color:inherit;
   text-decoration:none;
+}
+
+a, button {
+  transition: all 0.3s ease;
 }
 
 /* NAV */
@@ -153,7 +77,8 @@ a{
 }
 
 .nav-links a:hover{
-  color:white;
+  color: #5fb8dd;
+  transform: translateY(-2px);
 }
 
 @media(max-width:900px){
@@ -175,19 +100,13 @@ a{
 .outside{
   position:absolute;
   inset:0;
+  z-index:0;
   background:
       radial-gradient(circle at 20% 30%, rgba(95,184,221,0.15), transparent 35%),
       radial-gradient(circle at 80% 70%, rgba(95,184,221,0.12), transparent 30%),
       linear-gradient(180deg,#0c1119 0%,#070a10 60%,#04060a 100%);
 }
-.signature-name{
-  font-family:var(--accent-dim);
-  font-size: clamp(70px, 12vw, 170px);
-  color: rgba(255,255,255,0.85);
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-shadow: 0 0 25px rgba(255,255,255,0.15);
-}
+
 .skyline{
   position:absolute;
   bottom:0;
@@ -204,15 +123,46 @@ a{
   background:linear-gradient(180deg,#131b26,#0a0f16);
   border-top:1px solid rgba(95,184,221,0.18);
 }
+
+/* the canvas sits above the backdrop but below the name/copy so the
+   mist visually drifts in front of the night sky and behind the text
+   it's meant to obscure */
+#fogCanvas{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  cursor:none;
+}
+
 .signature-layer {
   position: absolute;
   top: 18%;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
 }
 
+.signature-name {
+  font-family: 'Bonheur Royale', cursive;
+  font-size: clamp(70px, 12vw, 170px);
+  font-weight: 400;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #ffffff, #c9d8ff 60%, #9fb4ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(160, 180, 255, 0.4));
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .signature-name {
+    font-size: clamp(48px, 16vw, 90px);
+  }
+}
 
 #sigPath{
   fill:none;
@@ -222,13 +172,6 @@ a{
   stroke-linejoin:round;
   stroke-dasharray:2600;
   stroke-dashoffset:2600;
-}
-
-#fogCanvas{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
 }
 
 .hero-copy{
@@ -241,10 +184,12 @@ a{
 }
 
 .eyebrow{
+  font-family:'Space Mono', monospace;
   color:var(--accent);
   font-size:12px;
   letter-spacing:2px;
   margin-bottom:12px;
+  text-transform:uppercase;
 }
 
 .hero-title{
@@ -270,9 +215,12 @@ a{
   top:24px;
   left:50%;
   transform:translateX(-50%);
+  font-family:'Space Mono', monospace;
   font-size:12px;
   color:var(--frost-dim);
   z-index:10;
+  transition: opacity 0.6s ease;
+  pointer-events:none;
 }
 
 .dot{
@@ -293,6 +241,7 @@ a{
   height:30px;
   border:1px solid rgba(255,255,255,.4);
   border-radius:12px;
+  z-index:5;
 }
 
 /* GENERAL SECTIONS */
@@ -327,13 +276,6 @@ a{
   height:1px;
   background:var(--line);
 }
-a, button {
-  transition: all 0.3s ease;
-}
-.nav-links a:hover {
-  color: #5fb8dd;
-  transform: translateY(-2px);
-}
 
 /* ABOUT */
 .about-grid{
@@ -347,6 +289,7 @@ a, button {
   line-height:1.8;
   color:var(--frost-dim);
 }
+
 .about-section {
   display: flex;
   gap: 50px;
@@ -359,18 +302,24 @@ a, button {
   object-fit: cover;
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.1);
-  transition: all 0.4s ease;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
 }
 
-.about-image img:hover {
-  transform: translateY(-8px) scale(1.03);
+.about-image:hover img {
+  transform: translateY(-8px) scale(1.04);
   box-shadow: 0 20px 50px rgba(95,184,221,0.25);
 }
+
 .stat{
   display:flex;
   justify-content:space-between;
   padding:18px 0;
   border-bottom:1px solid var(--line);
+  transition: transform 0.3s ease;
+}
+
+.stat:hover{
+  transform: scale(1.06);
 }
 
 .stat-label{
@@ -389,6 +338,12 @@ a, button {
   border-radius:18px;
   padding:32px;
   margin-bottom:24px;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.project:hover{
+  transform: scale(1.01);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.3);
 }
 
 .project-top{
@@ -427,6 +382,12 @@ a, button {
 .capstone-media video{
   width:100%;
   display:block;
+  transition: transform 0.4s ease;
+}
+
+.capstone-media:hover img,
+.capstone-media:hover video{
+  transform: scale(1.04);
 }
 
 /* PRYOPORT SHOTS */
@@ -442,6 +403,12 @@ a, button {
   border-radius:12px;
   overflow:hidden;
   background:var(--panel);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shot-card:hover{
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.3);
 }
 
 .shot-card img{
@@ -477,6 +444,14 @@ a, button {
   border-radius:8px;
   background:var(--panel);
   color:var(--frost-dim);
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.chip:hover{
+  transform: scale(1.12);
+  filter: brightness(1.25);
+  color:var(--frost);
+  border-color:var(--accent-dim);
 }
 
 /* PRACTICE */
@@ -490,6 +465,11 @@ a, button {
   gap:20px;
   padding:24px 0;
   border-bottom:1px solid var(--line);
+  transition: transform 0.3s ease;
+}
+
+.practice-item:hover{
+  transform: scale(1.015);
 }
 
 .practice-main h4{
@@ -510,6 +490,12 @@ a, button {
   border:1px solid var(--line);
   border-radius:8px;
   height:fit-content;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.practice-repo:hover{
+  transform: scale(1.06);
+  background:var(--panel);
 }
 
 /* ACHIEVEMENTS */
@@ -524,6 +510,12 @@ a, button {
   background:var(--panel);
   border:1px solid var(--line);
   border-radius:14px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ach-card:hover{
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 /* CERTS */
@@ -538,12 +530,23 @@ a, button {
   border:1px solid var(--line);
   border-radius:16px;
   overflow:hidden;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.cert-card:hover{
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
 }
 
 .cert-card img{
   width:100%;
   height:250px;
   object-fit:cover;
+  transition: transform 0.4s ease;
+}
+
+.cert-card:hover img{
+  transform: scale(1.08);
 }
 
 .cert-card-body{
@@ -585,6 +588,11 @@ a, button {
   padding:12px 20px;
   border:1px solid var(--line);
   border-radius:8px;
+  transition: transform 0.3s ease;
+}
+
+.contact-link:hover{
+  transform: scale(1.08);
 }
 
 .contact-link.primary{

@@ -1,3 +1,5 @@
+
+
 import { useRef, useEffect } from "react";
 
 export default function useFogEffect() {
@@ -17,18 +19,19 @@ export default function useFogEffect() {
 
     let W, H;
     let stars = [];
+    let puffs = [];
     let animationId;
-    let mouse = { x: -9999, y: -9999, active: false };
+
+    // mouse / drag tracking
+    let mouse = { x: -9999, y: -9999, px: -9999, py: -9999, vx: 0, vy: 0, active: false };
 
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-    // Signature animation
     const sig = sigRef.current;
     if (sig && sig.getTotalLength) {
       const len = sig.getTotalLength();
       sig.style.strokeDasharray = len;
       sig.style.strokeDashoffset = len;
-
       requestAnimationFrame(() => {
         sig.style.transition = "stroke-dashoffset 2.6s ease";
         sig.style.strokeDashoffset = "0";
@@ -47,6 +50,7 @@ export default function useFogEffect() {
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
       initStars();
+      initPuffs();
     }
 
     function initStars() {
@@ -56,9 +60,26 @@ export default function useFogEffect() {
         r: Math.random() * 1.7 + 0.3,
         opacity: Math.random(),
         twinkle: Math.random() * 3000 + 1000,
-        // gentle drift velocity so stars are always moving
         vx: (Math.random() - 0.5) * 0.05,
         vy: (Math.random() - 0.5) * 0.05,
+      }));
+    }
+
+    // cloud puffs: independent soft mist blobs that drift on their own
+    // and get physically pushed when the cursor drags through them
+    function initPuffs() {
+      const count = Math.max(12, Math.floor((W * H) / 60000));
+      puffs = Array.from({ length: count }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 120 + Math.random() * 160,
+        // slow ambient current, every puff drifts slightly differently
+        ax: (Math.random() - 0.5) * 0.12,
+        ay: (Math.random() - 0.5) * 0.08,
+        // velocity accumulator (ambient + cursor-driven)
+        vx: 0,
+        vy: 0,
+        density: 0.55 + Math.random() * 0.35,
       }));
     }
 
@@ -67,31 +88,16 @@ export default function useFogEffect() {
       grad.addColorStop(0, "#02030a");
       grad.addColorStop(0.4, "#091325");
       grad.addColorStop(1, "#05070f");
-
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      let g1 = ctx.createRadialGradient(
-        W * 0.2,
-        H * 0.3,
-        0,
-        W * 0.2,
-        H * 0.3,
-        260
-      );
+      let g1 = ctx.createRadialGradient(W * 0.2, H * 0.3, 0, W * 0.2, H * 0.3, 260);
       g1.addColorStop(0, "rgba(100,160,255,0.14)");
       g1.addColorStop(1, "rgba(100,160,255,0)");
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, W, H);
 
-      let g2 = ctx.createRadialGradient(
-        W * 0.8,
-        H * 0.2,
-        0,
-        W * 0.8,
-        H * 0.2,
-        240
-      );
+      let g2 = ctx.createRadialGradient(W * 0.8, H * 0.2, 0, W * 0.8, H * 0.2, 240);
       g2.addColorStop(0, "rgba(180,120,255,0.12)");
       g2.addColorStop(1, "rgba(180,120,255,0)");
       ctx.fillStyle = g2;
@@ -100,19 +106,14 @@ export default function useFogEffect() {
 
     function drawStars(time = 0) {
       stars.forEach((s) => {
-        // drift the star
         s.x += s.vx;
         s.y += s.vy;
-
-        // wrap around edges so movement is continuous
         if (s.x < 0) s.x = W;
         if (s.x > W) s.x = 0;
         if (s.y < 0) s.y = H * 0.8;
         if (s.y > H * 0.8) s.y = 0;
 
-        const alpha =
-          s.opacity * (0.4 + 0.6 * Math.sin(time / s.twinkle));
-
+        const alpha = s.opacity * (0.4 + 0.6 * Math.sin(time / s.twinkle));
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${alpha})`;
@@ -120,61 +121,77 @@ export default function useFogEffect() {
       });
     }
 
-    function drawMist(time = 0) {
-      // thicker, more numerous mist layers ("more adamant")
-      for (let i = 0; i < 6; i++) {
-        const x =
-          W * 0.5 + Math.sin(time / (3000 + i * 700)) * 150;
-        const y =
-          H * 0.5 + Math.cos(time / (3800 + i * 450)) * 70;
+    function updatePuffs() {
+      const influenceR = 240; // how far the cursor's push reaches
+      const pushStrength = 0.9;
 
-        const grad = ctx.createRadialGradient(
-          x,
-          y,
-          0,
-          x,
-          y,
-          300 + i * 55
-        );
+      puffs.forEach((p) => {
+        // ambient drift, always present, this is why clouds move on their own
+        p.vx += p.ax * 0.02;
+        p.vy += p.ay * 0.02;
 
-        grad.addColorStop(0, `rgba(220,230,255,${0.09 - i * 0.006})`);
-        grad.addColorStop(1, "rgba(255,255,255,0)");
+        // cursor drag physically displaces nearby puffs
+        if (mouse.active) {
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, H);
-      }
+          if (dist < influenceR) {
+            const falloff = 1 - dist / influenceR;
+            // push away from cursor
+            p.vx += (dx / dist) * falloff * pushStrength;
+            p.vy += (dy / dist) * falloff * pushStrength;
+            // and carry along the drag direction, like wind dragging fog
+            p.vx += mouse.vx * falloff * 0.5;
+            p.vy += mouse.vy * falloff * 0.5;
+          }
+        }
+
+        // friction so puffs settle back into ambient drift instead of flying off
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // soft wrap so a puff pushed off-screen reappears, keeping the field full
+        const pad = p.r;
+        if (p.x < -pad) p.x = W + pad;
+        if (p.x > W + pad) p.x = -pad;
+        if (p.y < -pad) p.y = H + pad;
+        if (p.y > H + pad) p.y = -pad;
+      });
+
+      // decay the recorded mouse velocity so a held cursor stops pushing
+      mouse.vx *= 0.85;
+      mouse.vy *= 0.85;
     }
 
-    function drawFog() {
-      // denser fog overall so it has to be actively wiped
-      const fog = ctx.createRadialGradient(
-        W / 2,
-        H / 2,
-        0,
-        W / 2,
-        H / 2,
-        Math.max(W, H)
-      );
-
-      fog.addColorStop(0, "rgba(210,222,255,0.16)");
-      fog.addColorStop(0.5, "rgba(170,182,212,0.34)");
-      fog.addColorStop(1, "rgba(140,150,172,0.58)");
-
-      ctx.fillStyle = fog;
+    function drawPuffs() {
+      // base veil so the scene reads as "behind glass" even between puffs
+      ctx.fillStyle = "rgba(170,182,212,0.16)";
       ctx.fillRect(0, 0, W, H);
+
+      ctx.globalCompositeOperation = "lighten";
+      puffs.forEach((p) => {
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+        grad.addColorStop(0, `rgba(225,233,255,${0.5 * p.density})`);
+        grad.addColorStop(0.5, `rgba(195,206,235,${0.28 * p.density})`);
+        grad.addColorStop(1, "rgba(195,206,235,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalCompositeOperation = "source-over";
     }
 
     function drawScene(time = 0) {
       ctx.clearRect(0, 0, W, H);
       drawNightSky();
       drawStars(time);
-      drawMist(time);
-      drawFog();
-
-      // continuously clear around the cursor position, no click needed
-      if (mouse.active) {
-        wipe(mouse.x, mouse.y, 70);
-      }
+      updatePuffs();
+      drawPuffs();
     }
 
     function animate(time) {
@@ -182,41 +199,20 @@ export default function useFogEffect() {
       animationId = requestAnimationFrame(animate);
     }
 
-    function wipe(x, y, r = 60) {
-      ctx.save();
-      ctx.globalCompositeOperation = "destination-out";
-
-      const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
-      grad.addColorStop(0, "rgba(0,0,0,1)");
-      grad.addColorStop(0.7, "rgba(0,0,0,0.6)");
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.restore();
-    }
-
     function getPos(e) {
       const rect = canvas.getBoundingClientRect();
-
       if (e.touches) {
-        return {
-          x: e.touches[0].clientX - rect.left,
-          y: e.touches[0].clientY - rect.top,
-        };
+        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
       }
-
-      return {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      };
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
     }
 
     function move(e) {
       const p = getPos(e);
+      mouse.px = mouse.x === -9999 ? p.x : mouse.x;
+      mouse.py = mouse.y === -9999 ? p.y : mouse.y;
+      mouse.vx = p.x - mouse.px;
+      mouse.vy = p.y - mouse.py;
       mouse.x = p.x;
       mouse.y = p.y;
       mouse.active = true;
@@ -230,10 +226,8 @@ export default function useFogEffect() {
     resize();
     animate();
 
-    // cursor now clears mist just by moving, no drag/click required
     canvas.addEventListener("mousemove", move);
     canvas.addEventListener("mouseleave", leave);
-
     canvas.addEventListener("touchstart", move, { passive: true });
     canvas.addEventListener(
       "touchmove",
@@ -248,7 +242,6 @@ export default function useFogEffect() {
 
     return () => {
       cancelAnimationFrame(animationId);
-
       canvas.removeEventListener("mousemove", move);
       canvas.removeEventListener("mouseleave", leave);
       window.removeEventListener("touchend", leave);
@@ -256,10 +249,17 @@ export default function useFogEffect() {
     };
   }, []);
 
-  return {
-    canvasRef,
-    skylineRef,
-    sigRef,
-    hintRef,
-  };
+  return { canvasRef, skylineRef, sigRef, hintRef };
 }
+
+
+
+
+
+
+
+
+
+
+
+

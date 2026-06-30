@@ -101,7 +101,8 @@ function App() {
 
         <div ref={hintRef} className="hint">
           <span className="dot"></span>
-          move your cursor over the mist to clear it
+          
+          drag through the mist — it actually moves
         </div>
 
         <div className="hero-copy">
