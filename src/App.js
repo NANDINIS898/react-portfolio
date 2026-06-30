@@ -8,7 +8,7 @@ import pryoportDashboardImg from "./pryoport-dashboard.png";
 import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import useFogEffect from "./useFogEffect";
 import profileImage from "./nandini.jpeg";
-import AnimatedHeadline from "./AnimatedHeadline";
+import AnimatedHeadline from "./Animatedheadline";
 
 
 
