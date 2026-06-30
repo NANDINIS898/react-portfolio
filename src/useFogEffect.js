@@ -1,18 +1,20 @@
 import { useRef, useEffect } from "react";
 
 /**
- * Cinematic multi-layer fog system.
+ * Lightweight glass-fog effect.
  *
- * Design:
- * - 3 parallax cloud layers (far/mid/near) drifting independently → depth.
- * - Each layer is built from soft radial "clumps" that move on slow ambient
- *   curl-like noise so the whole bank breathes even with zero input.
- * - A separate "clarity field" (per-pixel-ish grid of clear values) is thinned
- *   wherever the cursor travels — this is what actually reveals the sky,
- *   not just light-dodging blend modes. Clarity decays back to 0 (full fog)
- *   over ~5-6s, so wiped patches drift back in like real condensation.
- * - "Hazy thin-out": clarity caps at ~0.62 opacity reduction, so it never
- *   becomes a hard clean hole — always atmospheric.
+ * Performance approach (this is the part that was lagging before):
+ * - NO ctx.filter blur. Canvas blur filters force a full-frame software blur
+ *   pass per draw call — with 3 layers + emitters that's 4+ full blurs every
+ *   frame, which tanks FPS. Softness here comes purely from radial gradients
+ *   (cheap, GPU-friendly) which look just as soft without the cost.
+ * - Single composite pass per frame, normal "source-over" blending — no
+ *   "lighten" stacking, which is what was blowing everything out to white.
+ * - Low, capped opacity per wisp (~0.10–0.16) so layers add up to a believable
+ *   misty veil instead of stacking toward solid white.
+ * - Clarity field unchanged in concept: cursor thins fog locally, decays back
+ *   over ~5.5s. Wipe reads instantly since opacity is now low enough that a
+ *   small reduction is visually obvious.
  */
 
 export default function useFogEffect() {
@@ -27,20 +29,18 @@ export default function useFogEffect() {
     const hint = hintRef.current;
     if (!canvas || !hero) return;
 
-    const ctx = canvas.getContext("2d");
-    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const ctx = canvas.getContext("2d", { alpha: false });
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5); // cap DPR — 2x was extra cost for no visible gain
 
     let W, H;
     let stars = [];
-    let layers = []; // [{clumps:[], speed, scale, opacity}]
-    let clarity = null; // Float32Array grid
+    let layers = [];
+    let clarity = null;
     let gridCols, gridRows, cellSize;
     let animationId;
-    let rafTime = 0;
 
-    let mouse = { x: -9999, y: -9999, px: -9999, py: -9999, active: false };
+    let mouse = { x: -9999, y: -9999, active: false };
 
-    // signature draw-on
     const sig = sigRef.current;
     if (sig && sig.getTotalLength) {
       const len = sig.getTotalLength();
@@ -61,7 +61,7 @@ export default function useFogEffect() {
       canvas.style.height = H + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
-      cellSize = 28; // resolution of the clarity field — finer = smoother wipes
+      cellSize = 32;
       gridCols = Math.ceil(W / cellSize) + 2;
       gridRows = Math.ceil(H / cellSize) + 2;
       clarity = new Float32Array(gridCols * gridRows);
@@ -71,114 +71,64 @@ export default function useFogEffect() {
     }
 
     function initStars() {
-      stars = Array.from({ length: 160 }, () => ({
+      stars = Array.from({ length: 90 }, () => ({
         x: Math.random() * W,
-        y: Math.random() * H * 0.75,
-        r: Math.random() * 1.5 + 0.3,
-        baseA: Math.random() * 0.5 + 0.2,
+        y: Math.random() * H * 0.7,
+        r: Math.random() * 1.3 + 0.3,
+        baseA: Math.random() * 0.4 + 0.15,
         tw: Math.random() * 3000 + 1500,
         phase: Math.random() * Math.PI * 2,
       }));
     }
 
-    // Build a parallax layer of smoky "wisps" — elongated, soft-edged streaks
-    // that flow horizontally like vapor/smog rather than puffy round clouds.
+    // Soft wisps — single radial gradient per wisp, gently elongated via
+    // non-uniform scale (cheap: ctx.scale, not a real blur).
     function makeLayer(opts) {
       const { count, rMin, rMax, speedX, opacity, hue } = opts;
-      const clumps = [];
+      const wisps = [];
       for (let i = 0; i < count; i++) {
-        const blobCount = 4 + Math.floor(Math.random() * 3);
-        const cx = Math.random() * W;
-        const cy = Math.random() * H;
-        const stretch = 1.8 + Math.random() * 1.4; // smoke is elongated, not round
-        const blobs = [];
-        for (let b = 0; b < blobCount; b++) {
-          blobs.push({
-            ox: (b - blobCount / 2) * (rMax * 0.55) + (Math.random() - 0.5) * rMax * 0.3,
-            oy: (Math.random() - 0.5) * rMax * 0.35,
-            rx: (rMin + Math.random() * (rMax - rMin)) * stretch,
-            ry: (rMin + Math.random() * (rMax - rMin)) * 0.55,
-          });
-        }
-        clumps.push({
-          x: cx,
-          y: cy,
-          blobs,
+        wisps.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: rMin + Math.random() * (rMax - rMin),
+          stretch: 1.6 + Math.random() * 1.2,
+          vx: speedX * (0.6 + Math.random() * 0.7),
           driftPhase: Math.random() * Math.PI * 2,
-          driftAmpY: 8 + Math.random() * 16,
-          vx: speedX * (0.7 + Math.random() * 0.6),
-          wobble: Math.random() * Math.PI * 2,
+          driftAmpY: 8 + Math.random() * 14,
         });
       }
-      return { clumps, opacity, hue, speedX };
+      return { wisps, opacity, hue };
     }
 
-    // Edge smoke emitters: vent-like sources on the left/right walls that
-    // continuously birth new wisps drifting inward, like smoke seeping in.
+    function initLayers() {
+      // Three depths, deliberately low-opacity and few in count — the
+      // previous version's "very white" problem was too many overlapping
+      // near-opaque layers in lighten mode. This caps total visual density.
+      layers = [
+        makeLayer({ count: 4, rMin: 140, rMax: 220, speedX: 1.6, opacity: 0.10, hue: "198,206,220" }),
+        makeLayer({ count: 5, rMin: 90, rMax: 150, speedX: 3.2, opacity: 0.13, hue: "206,213,226" }),
+        makeLayer({ count: 6, rMin: 55, rMax: 100, speedX: 5.6, opacity: 0.16, hue: "214,220,232" }),
+      ];
+      initEmitters();
+    }
+
+    // Side smoke emitters — same low-opacity treatment, no blur filter.
     let emitters = [];
     function initEmitters() {
       emitters = [];
-      const sides = [
-        { x: -20, dir: 1 },
-        { x: W + 20, dir: -1 },
-      ];
-      sides.forEach((side) => {
-        for (let i = 0; i < 4; i++) {
+      [{ x: -10, dir: 1 }, { x: W + 10, dir: -1 }].forEach((side) => {
+        for (let i = 0; i < 3; i++) {
           emitters.push({
             baseX: side.x,
-            y: H * (0.25 + Math.random() * 0.55),
+            y: H * (0.28 + Math.random() * 0.5),
             dir: side.dir,
-            speed: 14 + Math.random() * 10,
-            life: Math.random(),
-            maxLife: 9 + Math.random() * 6,
-            r: 70 + Math.random() * 60,
+            life: Math.random() * 6,
+            maxLife: 8 + Math.random() * 5,
+            r: 60 + Math.random() * 50,
             wob: Math.random() * Math.PI * 2,
           });
         }
       });
-    }
-
-    function updateAndDrawEmitters(time, dt) {
-      ctx.save();
-      ctx.filter = "blur(18px)";
-      emitters.forEach((em) => {
-        em.life += dt;
-        if (em.life > em.maxLife) {
-          em.life = 0;
-          em.y = H * (0.25 + Math.random() * 0.55);
-        }
-        const t = em.life / em.maxLife; // 0..1 across its travel
-        const travel = t * (W * 0.42);
-        const x = em.baseX + em.dir * travel;
-        const y = em.y + Math.sin(time / 1500 + em.wob) * 18;
-        // fade in, hold, fade out across its lifetime
-        const fade = Math.sin(Math.PI * Math.min(1, t * 1.15));
-        const localClarity = clarityAt(((x % W) + W) % W, y);
-        const opacity = 0.32 * fade * (1 - localClarity);
-        if (opacity <= 0.015) return;
-
-        const grad = ctx.createRadialGradient(x, y, 0, x, y, em.r);
-        grad.addColorStop(0, `rgba(225,230,238,${opacity})`);
-        grad.addColorStop(0.6, `rgba(210,217,230,${opacity * 0.5})`);
-        grad.addColorStop(1, "rgba(210,217,230,0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.ellipse(x, y, em.r * 1.6, em.r * 0.7, 0, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      ctx.restore();
-    }
-
-    function initLayers() {
-      layers = [
-        // far smog: large, slow, very soft — deep atmospheric haze
-        makeLayer({ count: 6, rMin: 90, rMax: 150, speedX: 2.4, opacity: 0.30, hue: "198,206,222" }),
-        // mid smog: medium drift
-        makeLayer({ count: 8, rMin: 60, rMax: 110, speedX: 4.8, opacity: 0.40, hue: "208,215,230" }),
-        // near smog: smaller, faster, denser — closest "glass-fog" layer
-        makeLayer({ count: 10, rMin: 38, rMax: 75, speedX: 8.2, opacity: 0.48, hue: "218,224,238" }),
-      ];
-      initEmitters();
     }
 
     function drawNightSky() {
@@ -189,36 +139,31 @@ export default function useFogEffect() {
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, W, H);
 
-      let g1 = ctx.createRadialGradient(W * 0.22, H * 0.28, 0, W * 0.22, H * 0.28, 300);
-      g1.addColorStop(0, "rgba(100,160,255,0.13)");
+      let g1 = ctx.createRadialGradient(W * 0.22, H * 0.28, 0, W * 0.22, H * 0.28, 280);
+      g1.addColorStop(0, "rgba(100,160,255,0.10)");
       g1.addColorStop(1, "rgba(100,160,255,0)");
       ctx.fillStyle = g1;
-      ctx.fillRect(0, 0, W, H);
-
-      let g2 = ctx.createRadialGradient(W * 0.78, H * 0.2, 0, W * 0.78, H * 0.2, 260);
-      g2.addColorStop(0, "rgba(180,130,255,0.10)");
-      g2.addColorStop(1, "rgba(180,130,255,0)");
-      ctx.fillStyle = g2;
       ctx.fillRect(0, 0, W, H);
     }
 
     function drawStars(time) {
+      ctx.fillStyle = "white";
       stars.forEach((s) => {
         const a = s.baseA * (0.5 + 0.5 * Math.sin(time / s.tw + s.phase));
+        ctx.globalAlpha = a;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${a})`;
         ctx.fill();
       });
+      ctx.globalAlpha = 1;
     }
 
-    // ---- Clarity field: where the mist has been thinned by the cursor ----
     function gridIndex(gx, gy) {
       return gy * gridCols + gx;
     }
 
     function wipeAt(x, y, strength) {
-      const radiusCells = 6.5; // wider influence — cursor clears a generous patch
+      const radiusCells = 6;
       const gx0 = Math.floor(x / cellSize);
       const gy0 = Math.floor(y / cellSize);
       for (let gy = gy0 - radiusCells; gy <= gy0 + radiusCells; gy++) {
@@ -228,29 +173,22 @@ export default function useFogEffect() {
           const dy = gy - y / cellSize;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist > radiusCells) continue;
-          const falloff = Math.pow(1 - dist / radiusCells, 0.7); // sharper near center, still soft at edge
+          const falloff = Math.pow(1 - dist / radiusCells, 0.7);
           const idx = gridIndex(gx, gy);
-          // hazy thin-out cap: never fully clears (max ~0.62), but ramps up fast
-          const target = 0.62 * falloff * strength;
+          const target = 0.62 * falloff * strength; // hazy cap, never fully clear
           if (target > clarity[idx]) clarity[idx] = target;
         }
       }
     }
 
     function updateClarity(dt) {
-      // decay toward 0 over ~5.5s dreamy regrowth, calibrated against the
-      // 0.62 hazy-thinout peak (not 1.0) so the full wipe-to-refog cycle
-      // actually takes ~5.5s rather than decaying early
-      const decayPerSecond = 0.62 / 5.5;
+      const decayPerSecond = 0.62 / 5.5; // ~5.5s dreamy regrowth
       const decay = decayPerSecond * dt;
       for (let i = 0; i < clarity.length; i++) {
-        if (clarity[i] > 0) {
-          clarity[i] = Math.max(0, clarity[i] - decay);
-        }
+        if (clarity[i] > 0) clarity[i] = Math.max(0, clarity[i] - decay);
       }
     }
 
-    // sample clarity (bilinear-ish, just nearest for perf) for a given pixel position
     function clarityAt(x, y) {
       const gx = Math.min(gridCols - 1, Math.max(0, Math.round(x / cellSize)));
       const gy = Math.min(gridRows - 1, Math.max(0, Math.round(y / cellSize)));
@@ -258,61 +196,77 @@ export default function useFogEffect() {
     }
 
     function drawLayer(layer, time, parallaxShift) {
-      ctx.save();
-      ctx.filter = "blur(14px)"; // smog/mist softness — no hard cloud edges
-      layer.clumps.forEach((c) => {
-        // ambient drift: horizontal current + gentle vertical bob, like vapor
-        c.x += c.vx * 0.016;
-        if (layer.speedX >= 0 && c.x - 400 > W) c.x = -400;
-        const bobY = Math.sin(time / 1700 + c.driftPhase) * c.driftAmpY;
-        const wob = Math.sin(time / 2200 + c.wobble) * 6;
-        const drawX = c.x + parallaxShift;
-        const drawY = c.y + bobY;
+      layer.wisps.forEach((w) => {
+        w.x += w.vx * 0.016;
+        if (w.x - w.r * 2 > W) w.x = -w.r * 2;
+        const drawX = w.x + parallaxShift;
+        const drawY = w.y + Math.sin(time / 1800 + w.driftPhase) * w.driftAmpY;
 
-        // local clarity reduces this clump's opacity (hazy thin-out from cursor)
         const localClarity = clarityAt(((drawX % W) + W) % W, drawY);
         const opacity = layer.opacity * (1 - localClarity);
-        if (opacity <= 0.015) return;
+        if (opacity <= 0.008) return;
 
-        c.blobs.forEach((b) => {
-          const bx = drawX + b.ox + wob;
-          const by = drawY + b.oy;
-          const grad = ctx.createRadialGradient(bx, by, 0, bx, by, b.rx);
-          grad.addColorStop(0, `rgba(${layer.hue},${opacity})`);
-          grad.addColorStop(0.5, `rgba(${layer.hue},${opacity * 0.5})`);
-          grad.addColorStop(1, `rgba(${layer.hue},0)`);
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.ellipse(bx, by, b.rx, b.ry, 0, 0, Math.PI * 2);
-          ctx.fill();
-        });
+        ctx.save();
+        ctx.translate(drawX, drawY);
+        ctx.scale(w.stretch, 1); // cheap horizontal stretch — no blur cost
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, w.r);
+        grad.addColorStop(0, `rgba(${layer.hue},${opacity})`);
+        grad.addColorStop(0.6, `rgba(${layer.hue},${opacity * 0.45})`);
+        grad.addColorStop(1, `rgba(${layer.hue},0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, w.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       });
-      ctx.restore();
+    }
+
+    function updateAndDrawEmitters(time, dt) {
+      emitters.forEach((em) => {
+        em.life += dt;
+        if (em.life > em.maxLife) {
+          em.life = 0;
+          em.y = H * (0.28 + Math.random() * 0.5);
+        }
+        const t = em.life / em.maxLife;
+        const travel = t * (W * 0.38);
+        const x = em.baseX + em.dir * travel;
+        const y = em.y + Math.sin(time / 1500 + em.wob) * 14;
+        const fade = Math.sin(Math.PI * Math.min(1, t * 1.15));
+        const localClarity = clarityAt(((x % W) + W) % W, y);
+        const opacity = 0.12 * fade * (1 - localClarity); // kept subtle, not a white blob
+        if (opacity <= 0.006) return;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(1.7, 0.7);
+        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, em.r);
+        grad.addColorStop(0, `rgba(220,226,236,${opacity})`);
+        grad.addColorStop(0.6, `rgba(210,217,230,${opacity * 0.5})`);
+        grad.addColorStop(1, "rgba(210,217,230,0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(0, 0, em.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      });
     }
 
     let lastTime = 0;
     function animate(time) {
       const dt = Math.min(0.05, (time - lastTime) / 1000 || 0);
       lastTime = time;
-      rafTime = time;
 
-      ctx.clearRect(0, 0, W, H);
       drawNightSky();
       drawStars(time);
-
       updateClarity(dt);
 
-      ctx.globalCompositeOperation = "lighten";
-      drawLayer(layers[0], time, Math.sin(time / 9000) * 14); // far
-      drawLayer(layers[1], time, Math.sin(time / 6000) * 22); // mid
-      drawLayer(layers[2], time, Math.sin(time / 4000) * 30); // near
-      updateAndDrawEmitters(time, dt); // smoke seeping in from the sides
-      ctx.globalCompositeOperation = "source-over";
+      drawLayer(layers[0], time, Math.sin(time / 9000) * 12);
+      drawLayer(layers[1], time, Math.sin(time / 6000) * 18);
+      drawLayer(layers[2], time, Math.sin(time / 4000) * 24);
+      updateAndDrawEmitters(time, dt);
 
-      // continuous wipe while cursor is active (not just on move events)
-      if (mouse.active) {
-        wipeAt(mouse.x, mouse.y, 1);
-      }
+      if (mouse.active) wipeAt(mouse.x, mouse.y, 1);
 
       animationId = requestAnimationFrame(animate);
     }
@@ -327,8 +281,6 @@ export default function useFogEffect() {
 
     function move(e) {
       const p = getPos(e);
-      // interpolate between last and current position so fast moves
-      // leave a continuous wiped trail instead of dotted gaps
       if (mouse.active && mouse.x > -9000) {
         const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
         const steps = Math.max(1, Math.floor(dist / (cellSize * 0.6)));
@@ -337,17 +289,12 @@ export default function useFogEffect() {
           wipeAt(mouse.x + (p.x - mouse.x) * t, mouse.y + (p.y - mouse.y) * t, 1);
         }
       }
-      mouse.px = mouse.x;
-      mouse.py = mouse.y;
       mouse.x = p.x;
       mouse.y = p.y;
       mouse.active = true;
       if (hint) hint.style.opacity = "0";
     }
 
-    function enter(e) {
-      move(e);
-    }
     function leave() {
       mouse.active = false;
       mouse.x = -9999;
@@ -358,7 +305,6 @@ export default function useFogEffect() {
     animationId = requestAnimationFrame(animate);
 
     canvas.addEventListener("mousemove", move);
-    canvas.addEventListener("mouseenter", enter);
     canvas.addEventListener("mouseleave", leave);
     canvas.addEventListener("touchstart", move, { passive: true });
     canvas.addEventListener(
@@ -375,7 +321,6 @@ export default function useFogEffect() {
     return () => {
       cancelAnimationFrame(animationId);
       canvas.removeEventListener("mousemove", move);
-      canvas.removeEventListener("mouseenter", enter);
       canvas.removeEventListener("mouseleave", leave);
       window.removeEventListener("touchend", leave);
       window.removeEventListener("resize", resize);
