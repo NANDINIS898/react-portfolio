@@ -66,19 +66,27 @@ export default function useFogEffect() {
       gridRows = Math.ceil(H / cellSize) + 2;
       clarity = new Float32Array(gridCols * gridRows);
 
+      mountainPaths = null; // rebuild silhouette geometry for new dimensions
+
       initStars();
       initLayers();
     }
 
     function initStars() {
-      stars = Array.from({ length: 90 }, () => ({
-        x: Math.random() * W,
-        y: Math.random() * H * 0.7,
-        r: Math.random() * 1.3 + 0.3,
-        baseA: Math.random() * 0.4 + 0.15,
-        tw: Math.random() * 3000 + 1500,
-        phase: Math.random() * Math.PI * 2,
-      }));
+      stars = Array.from({ length: 90 }, () => {
+        const depth = Math.random(); // 0 = far/slow, 1 = near/faster — adds dreamy parallax
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H * 0.7,
+          r: 0.3 + depth * 1.3,
+          baseA: Math.random() * 0.4 + 0.15,
+          tw: Math.random() * 3000 + 1500,
+          phase: Math.random() * Math.PI * 2,
+          depth,
+          vx: -(0.004 + depth * 0.014), // gentle leftward drift, faster for "nearer" stars
+          vy: (Math.random() - 0.5) * 0.006, // barely-there vertical sway
+        };
+      });
     }
 
     // Soft wisps — single radial gradient per wisp, gently elongated via
@@ -144,12 +152,102 @@ export default function useFogEffect() {
       g1.addColorStop(1, "rgba(100,160,255,0)");
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, W, H);
+
+      drawMountains();
+      drawRoad();
+    }
+
+    // Layered mountain silhouettes — far range lighter/bluer, near range darker.
+    // Static jagged path, generated once and cached so we're not recomputing
+    // random points every frame.
+    let mountainPaths = null;
+    function buildMountains() {
+      function ridge(baseY, amp, segs) {
+        const pts = [[0, H]];
+        let y = baseY;
+        for (let i = 0; i <= segs; i++) {
+          const x = (i / segs) * W;
+          y = baseY + Math.sin(i * 1.3 + i * 0.7) * amp * (0.4 + Math.random() * 0.6);
+          pts.push([x, y]);
+        }
+        pts.push([W, H]);
+        return pts;
+      }
+      mountainPaths = [
+        { pts: ridge(H * 0.62, 30, 7), fill: "rgba(40,52,74,0.55)" }, // far
+        { pts: ridge(H * 0.7, 40, 6), fill: "rgba(22,30,46,0.75)" }, // mid
+        { pts: ridge(H * 0.78, 26, 5), fill: "rgba(10,14,24,0.92)" }, // near
+      ];
+    }
+
+    function drawMountains() {
+      if (!mountainPaths) buildMountains();
+      mountainPaths.forEach((range) => {
+        ctx.beginPath();
+        range.pts.forEach(([x, y], i) => (i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
+        ctx.closePath();
+        ctx.fillStyle = range.fill;
+        ctx.fill();
+      });
+    }
+
+    // Simple receding night road — perspective trapezoid with a faded
+    // center dashed line, vanishing toward a horizon point.
+    function drawRoad() {
+      const vanishX = W / 2;
+      const vanishY = H * 0.78;
+      const bottomY = H;
+      const bottomHalfWidth = W * 0.42;
+
+      ctx.beginPath();
+      ctx.moveTo(vanishX, vanishY);
+      ctx.lineTo(vanishX - bottomHalfWidth, bottomY);
+      ctx.lineTo(vanishX + bottomHalfWidth, bottomY);
+      ctx.closePath();
+      const roadGrad = ctx.createLinearGradient(0, vanishY, 0, bottomY);
+      roadGrad.addColorStop(0, "rgba(18,22,32,0.85)");
+      roadGrad.addColorStop(1, "rgba(8,10,16,0.95)");
+      ctx.fillStyle = roadGrad;
+      ctx.fill();
+
+      // dashed center line, perspective-scaled (dashes shrink toward horizon)
+      ctx.strokeStyle = "rgba(220,228,240,0.18)";
+      const dashCount = 7;
+      for (let i = 0; i < dashCount; i++) {
+        const t0 = i / dashCount;
+        const t1 = (i + 0.5) / dashCount;
+        const y0 = vanishY + (bottomY - vanishY) * t0 * t0;
+        const y1 = vanishY + (bottomY - vanishY) * t1 * t1;
+        ctx.lineWidth = 1 + t0 * 3;
+        ctx.beginPath();
+        ctx.moveTo(vanishX, y0);
+        ctx.lineTo(vanishX, y1);
+        ctx.stroke();
+      }
     }
 
     function drawStars(time) {
-      ctx.fillStyle = "white";
       stars.forEach((s) => {
+        // dreamy slow drift with gentle sway, wraps around edges
+        s.x += s.vx;
+        s.y += s.vy + Math.sin(time / 4000 + s.phase) * 0.003;
+        if (s.x < -5) s.x = W + 5;
+        if (s.x > W + 5) s.x = -5;
+        if (s.y < -5) s.y = H * 0.7;
+        if (s.y > H * 0.7 + 5) s.y = -5;
+
         const a = s.baseA * (0.5 + 0.5 * Math.sin(time / s.tw + s.phase));
+        // soft glow halo for nearer/brighter stars — adds to the dreamy feel
+        if (s.depth > 0.6) {
+          const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);
+          glow.addColorStop(0, `rgba(255,255,255,${a * 0.35})`);
+          glow.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = "white";
         ctx.globalAlpha = a;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
