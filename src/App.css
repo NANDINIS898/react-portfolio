@@ -146,7 +146,7 @@ a, button {
 }
 
 .signature-name {
-  font-family: 'Bonheur Royale', cursive;
+  font-family: 'Clash Display', sans-serif;
   font-size: clamp(70px, 12vw, 170px);
   font-weight: 400;
   letter-spacing: 1px;
