@@ -150,34 +150,41 @@ a, button {
    or merge into the existing @import url(...) line if you prefer one import. */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=Space+Mono:wght@400;700&display=swap');
 
-.signature-layer {
-  position: absolute;
-  top: 16%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  pointer-events: none;
-  width: 92%;
-  text-align: center;
-}
-
 .signature-name {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   font-weight: 600;
-  /* clamp scales down aggressively on narrow screens so both words
-     always sit on one line without wrapping or overflowing */
   font-size: clamp(28px, 7.2vw, 110px);
   letter-spacing: clamp(2px, 0.6vw, 6px);
   white-space: nowrap;
   background: linear-gradient(135deg, #ffffff, #c9d8ff 55%, #9fb4ff);
   -webkit-background-clip: text;
-  background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 20px rgba(160, 180, 255, 0.35));
-  margin: 0;
   display: inline-block;
+  animation: floatName 4s ease-in-out infinite;
 }
+
+@keyframes floatName {
+  0%,100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.signature-layer {
+  position: absolute;
+  top: 28%;   /* was 16% */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  pointer-events: none;
+  width: 100%;
+  text-align: center;
+}
+
+
 
 /* extra-narrow phones: drop letter-spacing further before ever wrapping */
 @media (max-width: 420px) {
@@ -204,14 +211,7 @@ a, button {
   stroke-dashoffset:2600;
 }
 
-.hero-copy{
-  position:absolute;
-  left:0;
-  right:0;
-  bottom:0;
-  padding:0 5vw 60px;
-  z-index:5;
-}
+.hero-copy{ position:absolute; left:0; right:0; bottom:0; padding:0 5vw 60px; z-index:5; }
 
 .eyebrow{
   font-family:'Space Mono', monospace;

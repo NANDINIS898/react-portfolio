@@ -94,6 +94,9 @@ function App() {
 
         <div className="signature-layer">
   <h1 className="signature-name">Nandini Gangwar</h1>
+  <div className="eyebrow">
+            AI Systems Engineer · President, eCell MSIT
+          </div>
 </div>
 
         
@@ -107,9 +110,7 @@ function App() {
         </div>
 
         <div className="hero-copy">
-          <div className="eyebrow">
-            AI Systems Engineer · President, eCell MSIT
-          </div>
+          
 
           <AnimatedHeadline
             parts={[
