@@ -136,14 +136,7 @@ a, button {
   cursor:none;
 }
 
-.signature-layer {
-  position: absolute;
-  top: 18%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  pointer-events: none;
-}
+
 
 /* ===== Signature name: "NANDINI GANGWAR" on one line, distinct font ===== */
 /* Add this @import near the top of App.css alongside the existing one,
