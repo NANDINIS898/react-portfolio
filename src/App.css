@@ -222,11 +222,7 @@ a, button {
   text-transform:uppercase;
 }
 
-.hero-title{
-  font-size:clamp(32px,5vw,60px);
-  line-height:1.1;
-  font-weight:700;
-}
+
 
 .hero-title em{
   color:var(--accent);

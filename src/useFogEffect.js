@@ -69,6 +69,7 @@ export default function useFogEffect() {
       mountainPaths = null; // rebuild silhouette geometry for new dimensions
 
       initStars();
+      initMotes();
       initLayers();
     }
 
@@ -86,6 +87,45 @@ export default function useFogEffect() {
           vx: -(0.025 + depth * 0.085), // ~6x faster than before — motion now clearly visible
           vy: (Math.random() - 0.5) * 0.03,
         };
+      });
+    }
+
+    // Floating dust motes — small glowing specks drifting slowly upward
+    // across the whole hero (not confined to the sky band like stars), for
+    // a dreamier, more atmospheric layer in front of the mountains/road.
+    let motes = [];
+    function initMotes() {
+      motes = Array.from({ length: 36 }, () => ({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: 0.8 + Math.random() * 1.8,
+        baseA: 0.15 + Math.random() * 0.35,
+        vy: -(0.012 + Math.random() * 0.02), // gentle upward drift
+        vx: (Math.random() - 0.5) * 0.015,
+        wobblePhase: Math.random() * Math.PI * 2,
+        wobbleSpeed: 1200 + Math.random() * 1800,
+      }));
+    }
+
+    function drawMotes(time) {
+      motes.forEach((m) => {
+        m.x += m.vx + Math.sin(time / m.wobbleSpeed + m.wobblePhase) * 0.012;
+        m.y += m.vy;
+        if (m.y < -8) {
+          m.y = H + 8;
+          m.x = Math.random() * W;
+        }
+        if (m.x < -8) m.x = W + 8;
+        if (m.x > W + 8) m.x = -8;
+
+        const a = m.baseA * (0.6 + 0.4 * Math.sin(time / 1600 + m.wobblePhase));
+        const glow = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 5);
+        glow.addColorStop(0, `rgba(225,232,245,${a})`);
+        glow.addColorStop(1, "rgba(225,232,245,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r * 5, 0, Math.PI * 2);
+        ctx.fill();
       });
     }
 
@@ -153,8 +193,36 @@ export default function useFogEffect() {
       ctx.fillStyle = g1;
       ctx.fillRect(0, 0, W, H);
 
+      drawMoon();
       drawMountains();
       drawRoad();
+    }
+
+    // Soft glowing moon — sits upper-right, large diffuse halo for a dreamy
+    // ambient light source the mist can drift across.
+    function drawMoon() {
+      const mx = W * 0.78;
+      const my = H * 0.16;
+      const haloR = Math.min(W, H) * 0.32;
+
+      const halo = ctx.createRadialGradient(mx, my, 0, mx, my, haloR);
+      halo.addColorStop(0, "rgba(210,222,245,0.16)");
+      halo.addColorStop(0.4, "rgba(180,200,235,0.07)");
+      halo.addColorStop(1, "rgba(180,200,235,0)");
+      ctx.fillStyle = halo;
+      ctx.beginPath();
+      ctx.arc(mx, my, haloR, 0, Math.PI * 2);
+      ctx.fill();
+
+      const bodyR = Math.min(W, H) * 0.045;
+      const body = ctx.createRadialGradient(mx - bodyR * 0.3, my - bodyR * 0.3, 0, mx, my, bodyR);
+      body.addColorStop(0, "rgba(255,255,250,0.95)");
+      body.addColorStop(0.7, "rgba(225,232,245,0.85)");
+      body.addColorStop(1, "rgba(200,212,235,0.6)");
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.arc(mx, my, bodyR, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     // Layered mountain silhouettes — far range lighter/bluer, near range darker.

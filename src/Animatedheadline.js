@@ -1,4 +1,5 @@
 import React from "react";
+import "./Animatedheadline.css";
 
 /**
  * AnimatedHeadline — splits text into words and staggers a fade+rise

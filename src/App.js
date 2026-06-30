@@ -9,7 +9,7 @@ import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import useFogEffect from "./useFogEffect";
 import profileImage from "./nandini.jpeg";
 import AnimatedHeadline from "./Animatedheadline";
-
+import "./Animatedheadline.css";
 
 
 const techStack = [
