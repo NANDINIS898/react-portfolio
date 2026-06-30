@@ -83,8 +83,8 @@ export default function useFogEffect() {
           tw: Math.random() * 3000 + 1500,
           phase: Math.random() * Math.PI * 2,
           depth,
-          vx: -(0.004 + depth * 0.014), // gentle leftward drift, faster for "nearer" stars
-          vy: (Math.random() - 0.5) * 0.006, // barely-there vertical sway
+          vx: -(0.025 + depth * 0.085), // ~6x faster than before — motion now clearly visible
+          vy: (Math.random() - 0.5) * 0.03,
         };
       });
     }
@@ -228,15 +228,32 @@ export default function useFogEffect() {
 
     function drawStars(time) {
       stars.forEach((s) => {
-        // dreamy slow drift with gentle sway, wraps around edges
+        // dreamy drift, now with a stronger sway so the faster motion still feels fluid, not jittery
         s.x += s.vx;
-        s.y += s.vy + Math.sin(time / 4000 + s.phase) * 0.003;
-        if (s.x < -5) s.x = W + 5;
-        if (s.x > W + 5) s.x = -5;
-        if (s.y < -5) s.y = H * 0.7;
-        if (s.y > H * 0.7 + 5) s.y = -5;
+        s.y += s.vy + Math.sin(time / 3200 + s.phase) * 0.018;
+        if (s.x < -10) s.x = W + 10;
+        if (s.x > W + 10) s.x = -10;
+        if (s.y < -10) s.y = H * 0.7;
+        if (s.y > H * 0.7 + 10) s.y = -10;
 
         const a = s.baseA * (0.5 + 0.5 * Math.sin(time / s.tw + s.phase));
+
+        // motion trail for nearer/faster stars — a short streak opposite the
+        // drift direction, so the increased speed reads as smooth movement
+        // rather than stars just jumping frame to frame
+        if (s.depth > 0.45) {
+          const trailLen = 4 + s.depth * 14;
+          const grad = ctx.createLinearGradient(s.x, s.y, s.x - trailLen, s.y - s.vy * 40);
+          grad.addColorStop(0, `rgba(255,255,255,${a * 0.5})`);
+          grad.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = Math.max(0.5, s.r * 0.7);
+          ctx.beginPath();
+          ctx.moveTo(s.x, s.y);
+          ctx.lineTo(s.x - trailLen, s.y - s.vy * 40);
+          ctx.stroke();
+        }
+
         // soft glow halo for nearer/brighter stars — adds to the dreamy feel
         if (s.depth > 0.6) {
           const glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 4);

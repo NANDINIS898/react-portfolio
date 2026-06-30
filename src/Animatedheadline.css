@@ -1,0 +1,45 @@
+/* ===== Word-by-word fade + rise headline animation ===== */
+
+.animated-headline {
+  /* prevents layout shift / overflow clipping cutting off the rise motion */
+  overflow: visible;
+}
+
+.word-reveal {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.5em);
+  filter: blur(4px);
+  animation: word-fade-rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  will-change: transform, opacity, filter;
+}
+
+.word-reveal.word-em {
+  color: var(--accent);
+}
+
+@keyframes word-fade-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0.5em);
+    filter: blur(4px);
+  }
+  60% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+/* respect reduced-motion preference — show immediately, no animation */
+@media (prefers-reduced-motion: reduce) {
+  .word-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}

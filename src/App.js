@@ -8,6 +8,7 @@ import pryoportDashboardImg from "./pryoport-dashboard.png";
 import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import useFogEffect from "./useFogEffect";
 import profileImage from "./nandini.jpeg";
+import AnimatedHeadline from "./AnimatedHeadline";
 
 
 
@@ -110,15 +111,18 @@ function App() {
             AI Systems Engineer · President, eCell MSIT
           </div>
 
-          <h1 className="hero-title">
-            I build systems that <em>think,</em>
-            <br />
-            then make sure they're <em>correct & scalable.</em>
-          </h1>
+          <AnimatedHeadline
+            parts={[
+              { text: "I build systems that " },
+              { text: "think,", em: true, break: true },
+              { text: "then I make sure they're " },
+              { text: "correct and scalable.", em: true },
+            ]}
+          />
 
           <p className="hero-sub">
-            Agent-driven products, loan intelligence, and AI automation
-            engineered with product thinking and debugged until edge cases stop
+            Agent-driven products and AI automation
+            engineered with debugging until edge cases stop
             breaking.
           </p>
         </div>
@@ -141,7 +145,7 @@ function App() {
             <div className="about-image"><img src={profileImage} alt="Nandini" /></div>
             <div className="about-text">
               <p>
-                I’m a B.Tech student (CGPA :9.00) focused on building AI systems that solve
+                I’m a final year B.Tech student (CGPA :9.00) focused on building AI systems that solve
                 real-world problems through product thinking and engineering.
               </p>
 
