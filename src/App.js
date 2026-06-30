@@ -341,6 +341,13 @@ function App() {
             >
               <FaGithub /> GitHub
             </a>
+            <a
+              href="https://leetcode.com/u/nandiiinigangwar/"
+              className="contact-link"
+              >
+              <FaGithub /> LeetCode
+            </a>
+
 
             <a
               href="https://www.linkedin.com/in/nandini-gangwar-b47987213/"
