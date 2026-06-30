@@ -17,8 +17,8 @@ export default function useFogEffect() {
 
     let W, H;
     let stars = [];
-    let drawing = false;
     let animationId;
+    let mouse = { x: -9999, y: -9999, active: false };
 
     const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
@@ -47,7 +47,6 @@ export default function useFogEffect() {
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 
       initStars();
-      drawScene();
     }
 
     function initStars() {
@@ -57,6 +56,9 @@ export default function useFogEffect() {
         r: Math.random() * 1.7 + 0.3,
         opacity: Math.random(),
         twinkle: Math.random() * 3000 + 1000,
+        // gentle drift velocity so stars are always moving
+        vx: (Math.random() - 0.5) * 0.05,
+        vy: (Math.random() - 0.5) * 0.05,
       }));
     }
 
@@ -98,6 +100,16 @@ export default function useFogEffect() {
 
     function drawStars(time = 0) {
       stars.forEach((s) => {
+        // drift the star
+        s.x += s.vx;
+        s.y += s.vy;
+
+        // wrap around edges so movement is continuous
+        if (s.x < 0) s.x = W;
+        if (s.x > W) s.x = 0;
+        if (s.y < 0) s.y = H * 0.8;
+        if (s.y > H * 0.8) s.y = 0;
+
         const alpha =
           s.opacity * (0.4 + 0.6 * Math.sin(time / s.twinkle));
 
@@ -109,11 +121,12 @@ export default function useFogEffect() {
     }
 
     function drawMist(time = 0) {
-      for (let i = 0; i < 4; i++) {
+      // thicker, more numerous mist layers ("more adamant")
+      for (let i = 0; i < 6; i++) {
         const x =
-          W * 0.5 + Math.sin(time / (3000 + i * 800)) * 120;
+          W * 0.5 + Math.sin(time / (3000 + i * 700)) * 150;
         const y =
-          H * 0.5 + Math.cos(time / (4000 + i * 500)) * 50;
+          H * 0.5 + Math.cos(time / (3800 + i * 450)) * 70;
 
         const grad = ctx.createRadialGradient(
           x,
@@ -121,10 +134,10 @@ export default function useFogEffect() {
           0,
           x,
           y,
-          260 + i * 50
+          300 + i * 55
         );
 
-        grad.addColorStop(0, `rgba(220,230,255,${0.04 - i * 0.005})`);
+        grad.addColorStop(0, `rgba(220,230,255,${0.09 - i * 0.006})`);
         grad.addColorStop(1, "rgba(255,255,255,0)");
 
         ctx.fillStyle = grad;
@@ -133,6 +146,7 @@ export default function useFogEffect() {
     }
 
     function drawFog() {
+      // denser fog overall so it has to be actively wiped
       const fog = ctx.createRadialGradient(
         W / 2,
         H / 2,
@@ -142,9 +156,9 @@ export default function useFogEffect() {
         Math.max(W, H)
       );
 
-      fog.addColorStop(0, "rgba(220,230,255,0.08)");
-      fog.addColorStop(0.5, "rgba(180,190,220,0.22)");
-      fog.addColorStop(1, "rgba(150,160,180,0.42)");
+      fog.addColorStop(0, "rgba(210,222,255,0.16)");
+      fog.addColorStop(0.5, "rgba(170,182,212,0.34)");
+      fog.addColorStop(1, "rgba(140,150,172,0.58)");
 
       ctx.fillStyle = fog;
       ctx.fillRect(0, 0, W, H);
@@ -156,6 +170,11 @@ export default function useFogEffect() {
       drawStars(time);
       drawMist(time);
       drawFog();
+
+      // continuously clear around the cursor position, no click needed
+      if (mouse.active) {
+        wipe(mouse.x, mouse.y, 70);
+      }
     }
 
     function animate(time) {
@@ -169,6 +188,7 @@ export default function useFogEffect() {
 
       const grad = ctx.createRadialGradient(x, y, 0, x, y, r);
       grad.addColorStop(0, "rgba(0,0,0,1)");
+      grad.addColorStop(0.7, "rgba(0,0,0,0.6)");
       grad.addColorStop(1, "rgba(0,0,0,0)");
 
       ctx.fillStyle = grad;
@@ -195,31 +215,26 @@ export default function useFogEffect() {
       };
     }
 
-    function start(e) {
-      drawing = true;
+    function move(e) {
       const p = getPos(e);
-      wipe(p.x, p.y);
+      mouse.x = p.x;
+      mouse.y = p.y;
+      mouse.active = true;
       if (hint) hint.style.opacity = "0";
     }
 
-    function move(e) {
-      if (!drawing) return;
-      const p = getPos(e);
-      wipe(p.x, p.y);
-    }
-
-    function end() {
-      drawing = false;
+    function leave() {
+      mouse.active = false;
     }
 
     resize();
     animate();
 
-    canvas.addEventListener("mousedown", start);
+    // cursor now clears mist just by moving, no drag/click required
     canvas.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
+    canvas.addEventListener("mouseleave", leave);
 
-    canvas.addEventListener("touchstart", start, { passive: true });
+    canvas.addEventListener("touchstart", move, { passive: true });
     canvas.addEventListener(
       "touchmove",
       (e) => {
@@ -228,16 +243,15 @@ export default function useFogEffect() {
       },
       { passive: false }
     );
-    window.addEventListener("touchend", end);
+    window.addEventListener("touchend", leave);
     window.addEventListener("resize", resize);
 
     return () => {
       cancelAnimationFrame(animationId);
 
-      canvas.removeEventListener("mousedown", start);
       canvas.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseup", end);
-      window.removeEventListener("touchend", end);
+      canvas.removeEventListener("mouseleave", leave);
+      window.removeEventListener("touchend", leave);
       window.removeEventListener("resize", resize);
     };
   }, []);

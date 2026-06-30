@@ -101,7 +101,7 @@ function App() {
 
         <div ref={hintRef} className="hint">
           <span className="dot"></span>
-          breathe on the glass, then drag to wipe it clean
+          move your cursor over the mist to clear it
         </div>
 
         <div className="hero-copy">
