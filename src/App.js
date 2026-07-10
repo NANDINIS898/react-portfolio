@@ -175,7 +175,7 @@ function App() {
 
               <div className="stat">
                 <span className="stat-label">LeetCode</span>
-                <span className="stat-val">350+</span>
+                <span className="stat-val">400+</span>
               </div>
 
               <div className="stat">
