@@ -74,13 +74,13 @@ export default function useFogEffect() {
     }
 
     function initStars() {
-      stars = Array.from({ length: 90 }, () => {
+      stars = Array.from({ length: 170 }, () => {
         const depth = Math.random(); // 0 = far/slow, 1 = near/faster — adds dreamy parallax
         return {
           x: Math.random() * W,
-          y: Math.random() * H * 0.7,
-          r: 0.3 + depth * 1.3,
-          baseA: Math.random() * 0.4 + 0.15,
+          y: Math.random() * H * 0.75,
+          r: 0.4 + depth * 1.6,
+          baseA: Math.random() * 0.5 + 0.28,
           tw: Math.random() * 3000 + 1500,
           phase: Math.random() * Math.PI * 2,
           depth,
@@ -95,11 +95,11 @@ export default function useFogEffect() {
     // a dreamier, more atmospheric layer in front of the mountains/road.
     let motes = [];
     function initMotes() {
-      motes = Array.from({ length: 36 }, () => ({
+      motes = Array.from({ length: 60 }, () => ({
         x: Math.random() * W,
         y: Math.random() * H,
         r: 0.8 + Math.random() * 1.8,
-        baseA: 0.15 + Math.random() * 0.35,
+        baseA: 0.17 + Math.random() * 0.3,
         vy: -(0.012 + Math.random() * 0.02), // gentle upward drift
         vx: (Math.random() - 0.5) * 0.015,
         wobblePhase: Math.random() * Math.PI * 2,
@@ -149,13 +149,14 @@ export default function useFogEffect() {
     }
 
     function initLayers() {
-      // Three depths, deliberately low-opacity and few in count — the
-      // previous version's "very white" problem was too many overlapping
-      // near-opaque layers in lighten mode. This caps total visual density.
+      // Four depths — a big slow "cloud" layer plus the three original wisp
+      // bands, all turned up from the original low-visibility pass. Still
+      // radial-gradient only (no ctx.filter blur) so it stays cheap.
       layers = [
-        makeLayer({ count: 4, rMin: 140, rMax: 220, speedX: 1.6, opacity: 0.10, hue: "198,206,220" }),
-        makeLayer({ count: 5, rMin: 90, rMax: 150, speedX: 3.2, opacity: 0.13, hue: "206,213,226" }),
-        makeLayer({ count: 6, rMin: 55, rMax: 100, speedX: 5.6, opacity: 0.16, hue: "214,220,232" }),
+        makeLayer({ count: 3, rMin: 200, rMax: 300, speedX: 0.9, opacity: 0.09, hue: "190,200,218" }),
+        makeLayer({ count: 5, rMin: 140, rMax: 210, speedX: 1.8, opacity: 0.13, hue: "198,206,220" }),
+        makeLayer({ count: 7, rMin: 90, rMax: 150, speedX: 3.4, opacity: 0.16, hue: "206,213,226" }),
+        makeLayer({ count: 9, rMin: 55, rMax: 100, speedX: 5.8, opacity: 0.19, hue: "214,220,232" }),
       ];
       initEmitters();
     }
@@ -165,14 +166,14 @@ export default function useFogEffect() {
     function initEmitters() {
       emitters = [];
       [{ x: -10, dir: 1 }, { x: W + 10, dir: -1 }].forEach((side) => {
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
           emitters.push({
             baseX: side.x,
-            y: H * (0.28 + Math.random() * 0.5),
+            y: H * (0.24 + Math.random() * 0.55),
             dir: side.dir,
             life: Math.random() * 6,
-            maxLife: 8 + Math.random() * 5,
-            r: 60 + Math.random() * 50,
+            maxLife: 7 + Math.random() * 5,
+            r: 75 + Math.random() * 65,
             wob: Math.random() * Math.PI * 2,
           });
         }
@@ -417,7 +418,7 @@ export default function useFogEffect() {
         const y = em.y + Math.sin(time / 1500 + em.wob) * 14;
         const fade = Math.sin(Math.PI * Math.min(1, t * 1.15));
         const localClarity = clarityAt(((x % W) + W) % W, y);
-        const opacity = 0.12 * fade * (1 - localClarity); // kept subtle, not a white blob
+        const opacity = 0.16 * fade * (1 - localClarity);
         if (opacity <= 0.006) return;
 
         ctx.save();
@@ -444,9 +445,11 @@ export default function useFogEffect() {
       drawStars(time);
       updateClarity(dt);
 
-      drawLayer(layers[0], time, Math.sin(time / 9000) * 12);
-      drawLayer(layers[1], time, Math.sin(time / 6000) * 18);
-      drawLayer(layers[2], time, Math.sin(time / 4000) * 24);
+      drawLayer(layers[0], time, Math.sin(time / 11000) * 10);
+      drawLayer(layers[1], time, Math.sin(time / 9000) * 12);
+      drawLayer(layers[2], time, Math.sin(time / 6000) * 18);
+      drawLayer(layers[3], time, Math.sin(time / 4000) * 24);
+      drawMotes(time);
       updateAndDrawEmitters(time, dt);
 
       if (mouse.active) wipeAt(mouse.x, mouse.y, 1);

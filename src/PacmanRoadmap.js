@@ -37,8 +37,8 @@ const stops = [
     tag: "AI Screening Platform",
     // TODO(Nandini): swap in a real 1-2 line description + tech stack.
     desc:
-      "AI-driven candidate screening platform that scores and ranks applicants against role requirements to speed up early-stage hiring decisions.",
-    tech: "TODO: tech stack",
+      "AI-driven candidate screening platform that scores and ranks applicants with resume matching, github analysis and role requirements to speed up early-stage hiring decisions.",
+    tech: "TODO: FastAPI, Gmail calender API, NextJS, Groq, Celery, REDIS, PotgreSQL ",
     repo: "https://github.com/NANDINIS898/ai-screening-platform",
     demo: "https://visl-ai-lab-assignment-screening-pl.vercel.app/",
     media: { type: "placeholder" },

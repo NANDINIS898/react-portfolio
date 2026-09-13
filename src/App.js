@@ -5,6 +5,7 @@ import tensorflowCert from "./deeplearning.png";
 import genaiCert from "./genai_simulation.png";
 import useFogEffect from "./useFogEffect";
 import useFogReveal from "./useFogReveal";
+import useStarfield from "./useStarfield";
 import profileImage from "./nandini.jpeg";
 import AnimatedHeadline from "./Animatedheadline";
 import "./Animatedheadline.css";
@@ -71,9 +72,12 @@ function App() {
     canvasRef: fogCanvasRef,
     onImgLoad: onFogImgLoad,
   } = useFogReveal();
+  const { canvasRef: starfieldRef } = useStarfield();
 
   return (
     <div className="app">
+      <canvas ref={starfieldRef} className="starfield-canvas" aria-hidden="true"></canvas>
+
       {/* NAV */}
       <nav className="nav">
         <div className="nav-mark">
@@ -102,6 +106,15 @@ function App() {
   <div className="eyebrow">
             Building Systems, one late-night debug at a time
           </div>
+  <a
+    href="https://github.com/NANDINIS898"
+    target="_blank"
+    rel="noreferrer"
+    className="signature-github mist-hover"
+    aria-label="GitHub profile"
+  >
+    <FaGithub />
+  </a>
 </div>
 
         
