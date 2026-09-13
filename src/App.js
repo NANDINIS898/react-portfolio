@@ -3,13 +3,12 @@ import "./App.css";
 import { FaGithub, FaLinkedin, FaEnvelope } from "react-icons/fa";
 import tensorflowCert from "./deeplearning.png";
 import genaiCert from "./genai_simulation.png";
-import saarthiMainImg from "./saarthi-main.png";
-import pryoportDashboardImg from "./pryoport-dashboard.png";
-import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import useFogEffect from "./useFogEffect";
+import useFogReveal from "./useFogReveal";
 import profileImage from "./nandini.jpeg";
 import AnimatedHeadline from "./Animatedheadline";
 import "./Animatedheadline.css";
+import PacmanRoadmap from "./PacmanRoadmap";
 
 
 const techStack = [
@@ -66,6 +65,12 @@ const practiceProjects = [
 
 function App() {
   const { canvasRef, skylineRef, sigRef, hintRef } = useFogEffect();
+  const {
+    containerRef: fogContainerRef,
+    imgRef: fogImgRef,
+    canvasRef: fogCanvasRef,
+    onImgLoad: onFogImgLoad,
+  } = useFogReveal();
 
   return (
     <div className="app">
@@ -76,13 +81,13 @@ function App() {
         </div>
 
         <div className="nav-links">
-          <a href="#about">about</a>
-          <a href="#capstones">capstones</a>
-          <a href="#practice">practice</a>
-          <a href="#tech-stack">tech stack</a>
-          <a href="#achievements">achievements</a>
-          <a href="#certifications">certifications</a>
-          <a href="#contact">contact</a>
+          <a href="#about" className="mist-hover">about</a>
+          <a href="#capstones" className="mist-hover">capstones</a>
+          <a href="#practice" className="mist-hover">practice</a>
+          <a href="#tech-stack" className="mist-hover">tech stack</a>
+          <a href="#achievements" className="mist-hover">achievements</a>
+          <a href="#certifications" className="mist-hover">certifications</a>
+          <a href="#contact" className="mist-hover">contact</a>
         </div>
       </nav>
 
@@ -143,7 +148,11 @@ function App() {
 
 
           <div className="about-grid">
-            <div className="about-image"><img src={profileImage} alt="Nandini" /></div>
+            <div className="about-image" ref={fogContainerRef}>
+              <img src={profileImage} alt="Nandini" ref={fogImgRef} onLoad={onFogImgLoad} />
+              <canvas ref={fogCanvasRef} className="fog-reveal-canvas"></canvas>
+              <span className="fog-hint">✦ wipe the fog to reveal</span>
+            </div>
             <div className="about-text">
               <p>
                 I’m a final year B.Tech student (CGPA :9.00) focused on building AI systems that solve
@@ -163,22 +172,22 @@ function App() {
             </div>
 
             <div className="stat-rail">
-              <div className="stat">
+              <div className="stat mist-hover">
                 <span className="stat-label">Hackathon wins</span>
                 <span className="stat-val">3</span>
               </div>
 
-              <div className="stat">
+              <div className="stat mist-hover">
                 <span className="stat-label">Major AI Projects</span>
-                <span className="stat-val">2</span>
+                <span className="stat-val">3</span>
               </div>
 
-              <div className="stat">
+              <div className="stat mist-hover">
                 <span className="stat-label">LeetCode</span>
                 <span className="stat-val">400+</span>
               </div>
 
-              <div className="stat">
+              <div className="stat mist-hover">
                 <span className="stat-label">Target</span>
                 <span className="stat-val">SDE + AI</span>
               </div>
@@ -194,40 +203,11 @@ function App() {
             <span className="section-line"></span>
           </div>
 
-          <div className="project">
-            <div className="project-top">
-              <span className="project-name">Saarthi</span>
-              <span className="project-tag">Loan AI Assistant with Video Based Onboarding</span>
-            </div>
+          <p className="roadmap-intro">
+            Scroll to walk the bot down the line — three stops, three shipped products.
+          </p>
 
-            <p className="project-desc">
-              AI-powered loan underwriting and video onboarding platform with
-              XGBoost risk scoring, SHAP explainability, multi-agent negotiation,
-              and voice-based onboarding.
-            </p>
-            <link href="https://githum.com/NANDINIS898/saarthi-main" ></link>
-
-            <div className="capstone-media">
-              <img src={saarthiMainImg} alt="Saarthi" />
-            </div>
-          </div>
-
-          <div className="project">
-            <div className="project-top">
-              <span className="project-name">Pryoport</span>
-              <span className="project-tag">Smart Email Priority Detection Engine</span>
-            </div>
-
-            <p className="project-desc">
-              AI-powered email prioritisation system combining dashboard, browser
-              extension and alert engine. Makes sure all your important tasks & deadlines are never missed or buried under spam.
-            </p>
-            <link href="https://githum.com/NANDINIS898/pryoport" ></link>
-
-            <div className="capstone-media">
-              <video src={pryoportDemoVideo} controls />
-            </div>
-          </div>
+          <PacmanRoadmap />
         </section>
 
         {/* TECH STACK */}
@@ -240,7 +220,7 @@ function App() {
 
           <div className="stack-row">
             {techStack.map((item) => (
-              <span key={item} className="chip">
+              <span key={item} className="chip mist-hover">
                 {item}
               </span>
             ))}
@@ -264,7 +244,7 @@ function App() {
                   <span className="practice-tech">{p.tech}</span>
                 </div>
 
-                <a href={p.repo} className="practice-repo">
+                <a href={p.repo} className="practice-repo mist-hover">
                   <FaGithub /> GitHub
                 </a>
               </li>
@@ -281,13 +261,13 @@ function App() {
           </div>
 
           <div className="ach-grid">
-            <div className="ach-card">
+            <div className="ach-card mist-hover">
               🏆 IIT Delhi TRYST 2025 : 3rd Place
             </div>
-            <div className="ach-card">
+            <div className="ach-card mist-hover">
               🏅 DTU CodeWithDCG : Special Mention
             </div>
-            <div className="ach-card">
+            <div className="ach-card mist-hover">
               🥉 ABES Hacknovate 6.0 : 3rd Place
             </div>
           </div>
@@ -331,19 +311,19 @@ function App() {
           </p>
 
           <div className="contact-links">
-            <a href="mailto:nandinis898@gmail.com" className="contact-link primary">
+            <a href="mailto:nandinis898@gmail.com" className="contact-link primary mist-hover">
               <FaEnvelope /> Email
             </a>
 
             <a
               href="https://github.com/NANDINIS898"
-              className="contact-link"
+              className="contact-link mist-hover"
             >
               <FaGithub /> GitHub
             </a>
             <a
               href="https://leetcode.com/u/nandiiinigangwar/"
-              className="contact-link"
+              className="contact-link mist-hover"
               >
               <FaGithub /> LeetCode
             </a>
@@ -351,7 +331,7 @@ function App() {
 
             <a
               href="https://www.linkedin.com/in/nandini-gangwar-b47987213/"
-              className="contact-link"
+              className="contact-link mist-hover"
             >
               <FaLinkedin /> LinkedIn
             </a>
