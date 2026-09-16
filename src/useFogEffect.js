@@ -69,63 +69,23 @@ export default function useFogEffect() {
       mountainPaths = null; // rebuild silhouette geometry for new dimensions
 
       initStars();
-      initMotes();
       initLayers();
     }
 
     function initStars() {
-      stars = Array.from({ length: 170 }, () => {
+      stars = Array.from({ length: 70 }, () => {
         const depth = Math.random(); // 0 = far/slow, 1 = near/faster — adds dreamy parallax
         return {
           x: Math.random() * W,
           y: Math.random() * H * 0.75,
           r: 0.4 + depth * 1.6,
-          baseA: Math.random() * 0.5 + 0.28,
+          baseA: Math.random() * 0.45 + 0.2,
           tw: Math.random() * 3000 + 1500,
           phase: Math.random() * Math.PI * 2,
           depth,
           vx: -(0.025 + depth * 0.085), // ~6x faster than before — motion now clearly visible
           vy: (Math.random() - 0.5) * 0.03,
         };
-      });
-    }
-
-    // Floating dust motes — small glowing specks drifting slowly upward
-    // across the whole hero (not confined to the sky band like stars), for
-    // a dreamier, more atmospheric layer in front of the mountains/road.
-    let motes = [];
-    function initMotes() {
-      motes = Array.from({ length: 60 }, () => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        r: 0.8 + Math.random() * 1.8,
-        baseA: 0.17 + Math.random() * 0.3,
-        vy: -(0.012 + Math.random() * 0.02), // gentle upward drift
-        vx: (Math.random() - 0.5) * 0.015,
-        wobblePhase: Math.random() * Math.PI * 2,
-        wobbleSpeed: 1200 + Math.random() * 1800,
-      }));
-    }
-
-    function drawMotes(time) {
-      motes.forEach((m) => {
-        m.x += m.vx + Math.sin(time / m.wobbleSpeed + m.wobblePhase) * 0.012;
-        m.y += m.vy;
-        if (m.y < -8) {
-          m.y = H + 8;
-          m.x = Math.random() * W;
-        }
-        if (m.x < -8) m.x = W + 8;
-        if (m.x > W + 8) m.x = -8;
-
-        const a = m.baseA * (0.6 + 0.4 * Math.sin(time / 1600 + m.wobblePhase));
-        const glow = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.r * 5);
-        glow.addColorStop(0, `rgba(225,232,245,${a})`);
-        glow.addColorStop(1, "rgba(225,232,245,0)");
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r * 5, 0, Math.PI * 2);
-        ctx.fill();
       });
     }
 
@@ -149,35 +109,14 @@ export default function useFogEffect() {
     }
 
     function initLayers() {
-      // Four depths — a big slow "cloud" layer plus the three original wisp
-      // bands, all turned up from the original low-visibility pass. Still
-      // radial-gradient only (no ctx.filter blur) so it stays cheap.
+      // Just two depths of big, soft foggy clouds — no small wisps. Fewer,
+      // larger shapes read as actual drifting clouds instead of a scatter of
+      // small mist balls, and each is still cheap (radial gradient only, no
+      // ctx.filter blur).
       layers = [
-        makeLayer({ count: 3, rMin: 200, rMax: 300, speedX: 0.9, opacity: 0.09, hue: "190,200,218" }),
-        makeLayer({ count: 5, rMin: 140, rMax: 210, speedX: 1.8, opacity: 0.13, hue: "198,206,220" }),
-        makeLayer({ count: 7, rMin: 90, rMax: 150, speedX: 3.4, opacity: 0.16, hue: "206,213,226" }),
-        makeLayer({ count: 9, rMin: 55, rMax: 100, speedX: 5.8, opacity: 0.19, hue: "214,220,232" }),
+        makeLayer({ count: 4, rMin: 260, rMax: 380, speedX: 0.8, opacity: 0.34, hue: "196,206,222" }),
+        makeLayer({ count: 4, rMin: 180, rMax: 260, speedX: 1.5, opacity: 0.28, hue: "206,213,226" }),
       ];
-      initEmitters();
-    }
-
-    // Side smoke emitters — same low-opacity treatment, no blur filter.
-    let emitters = [];
-    function initEmitters() {
-      emitters = [];
-      [{ x: -10, dir: 1 }, { x: W + 10, dir: -1 }].forEach((side) => {
-        for (let i = 0; i < 4; i++) {
-          emitters.push({
-            baseX: side.x,
-            y: H * (0.24 + Math.random() * 0.55),
-            dir: side.dir,
-            life: Math.random() * 6,
-            maxLife: 7 + Math.random() * 5,
-            r: 75 + Math.random() * 65,
-            wob: Math.random() * Math.PI * 2,
-          });
-        }
-      });
     }
 
     function drawNightSky() {
@@ -347,7 +286,7 @@ export default function useFogEffect() {
     }
 
     function wipeAt(x, y, strength) {
-      const radiusCells = 6;
+      const radiusCells = 8;
       const gx0 = Math.floor(x / cellSize);
       const gy0 = Math.floor(y / cellSize);
       for (let gy = gy0 - radiusCells; gy <= gy0 + radiusCells; gy++) {
@@ -405,37 +344,6 @@ export default function useFogEffect() {
       });
     }
 
-    function updateAndDrawEmitters(time, dt) {
-      emitters.forEach((em) => {
-        em.life += dt;
-        if (em.life > em.maxLife) {
-          em.life = 0;
-          em.y = H * (0.28 + Math.random() * 0.5);
-        }
-        const t = em.life / em.maxLife;
-        const travel = t * (W * 0.38);
-        const x = em.baseX + em.dir * travel;
-        const y = em.y + Math.sin(time / 1500 + em.wob) * 14;
-        const fade = Math.sin(Math.PI * Math.min(1, t * 1.15));
-        const localClarity = clarityAt(((x % W) + W) % W, y);
-        const opacity = 0.16 * fade * (1 - localClarity);
-        if (opacity <= 0.006) return;
-
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.scale(1.7, 0.7);
-        const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, em.r);
-        grad.addColorStop(0, `rgba(220,226,236,${opacity})`);
-        grad.addColorStop(0.6, `rgba(210,217,230,${opacity * 0.5})`);
-        grad.addColorStop(1, "rgba(210,217,230,0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(0, 0, em.r, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-    }
-
     let lastTime = 0;
     function animate(time) {
       const dt = Math.min(0.05, (time - lastTime) / 1000 || 0);
@@ -446,11 +354,7 @@ export default function useFogEffect() {
       updateClarity(dt);
 
       drawLayer(layers[0], time, Math.sin(time / 11000) * 10);
-      drawLayer(layers[1], time, Math.sin(time / 9000) * 12);
-      drawLayer(layers[2], time, Math.sin(time / 6000) * 18);
-      drawLayer(layers[3], time, Math.sin(time / 4000) * 24);
-      drawMotes(time);
-      updateAndDrawEmitters(time, dt);
+      drawLayer(layers[1], time, Math.sin(time / 7000) * 16);
 
       if (mouse.active) wipeAt(mouse.x, mouse.y, 1);
 

@@ -4,7 +4,56 @@ import saarthiMainImg from "./saarthi-main.png";
 import pryoportDemoVideo from "./pryoport video - Trim.mp4";
 import "./PacmanRoadmap.css";
 
-const ROBOT_SIZE = 46;
+/**
+ * Winding maze road: waypoints in percent coordinates (x: 0-100 across the
+ * roadmap width, y: 0-100 down its height). Straight segments between them
+ * give the path its left/right turns — stops sit on the flat stretch at
+ * their peak swing so the pellet/robot land cleanly on a turn, not mid-bend.
+ */
+const PATH_POINTS = [
+  { y: 0, x: 50 },
+  { y: 5, x: 50 },
+  { y: 10, x: 60 }, // saarthi (right turn)
+  { y: 16, x: 60 },
+  { y: 26, x: 50 },
+  { y: 36, x: 40 },
+  { y: 44, x: 40 },
+  { y: 50, x: 40 }, // pryoport (left turn)
+  { y: 56, x: 40 },
+  { y: 66, x: 50 },
+  { y: 76, x: 60 },
+  { y: 84, x: 60 },
+  { y: 90, x: 60 }, // screen (right turn)
+  { y: 96, x: 60 },
+  { y: 100, x: 50 },
+];
+
+function pointAtY(pts, yPercent) {
+  if (yPercent <= pts[0].y) return pts[0];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const a = pts[i];
+    const b = pts[i + 1];
+    if (yPercent >= a.y && yPercent <= b.y) {
+      const t = b.y === a.y ? 0 : (yPercent - a.y) / (b.y - a.y);
+      return { x: a.x + (b.x - a.x) * t, y: yPercent };
+    }
+  }
+  return pts[pts.length - 1];
+}
+
+// Built in real pixel space (not the 0-100 percent space) so stroke width
+// and the dash-based "reveal" trick stay consistent regardless of how
+// stretched/narrow the roadmap container is.
+function toPixelPath(points, w, h) {
+  const pixelPoints = points.map((p) => ({ x: (p.x / 100) * w, y: (p.y / 100) * h }));
+  const d = "M " + pixelPoints.map((p) => `${p.x},${p.y}`).join(" L ");
+  const len = pixelPoints.reduce((total, p, i) => {
+    if (i === 0) return 0;
+    const prev = pixelPoints[i - 1];
+    return total + Math.hypot(p.x - prev.x, p.y - prev.y);
+  }, 0);
+  return { d, len };
+}
 
 const stops = [
   {
@@ -69,17 +118,16 @@ function ScreenMock() {
 export default function PacmanRoadmap() {
   const roadmapRef = useRef(null);
   const [progress, setProgress] = useState(0);
-  const [trackHeight, setTrackHeight] = useState(0);
+  const [containerSize, setContainerSize] = useState({ width: 972, height: 2200 });
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== "undefined" && window.innerWidth <= 900
+  );
 
   useEffect(() => {
     const el = roadmapRef.current;
     if (!el) return;
 
     let raf = null;
-
-    function measure() {
-      setTrackHeight(el.clientHeight);
-    }
 
     function computeProgress() {
       const rect = el.getBoundingClientRect();
@@ -90,6 +138,12 @@ export default function PacmanRoadmap() {
       const traveled = startOffset - rect.top;
       const p = denom > 0 ? traveled / denom : 0;
       setProgress(Math.min(1, Math.max(0, p)));
+    }
+
+    function measure() {
+      const rect = el.getBoundingClientRect();
+      setContainerSize({ width: rect.width, height: rect.height });
+      setIsMobile(window.innerWidth <= 900);
     }
 
     function onScroll() {
@@ -131,17 +185,50 @@ export default function PacmanRoadmap() {
     }
   });
 
-  const robotTop = Math.max(0, trackHeight - ROBOT_SIZE) * progress;
-  const wobble = Math.sin(progress * Math.PI * 14) * 6;
+  // On narrow screens the maze zigzag doesn't fit next to a full-width
+  // stacked card, so the path collapses to a straight vertical line pinned
+  // at the same fixed left offset the pellets/robot render at.
+  const mobileXPercent = containerSize.width > 0 ? (22 / containerSize.width) * 100 : 6;
+  const activePoints = isMobile
+    ? PATH_POINTS.map((p) => ({ ...p, x: mobileXPercent }))
+    : PATH_POINTS;
+
+  const robotPoint = pointAtY(activePoints, progress * 100);
+  // heading accounts for the container's real aspect ratio so the rotation
+  // matches the actual on-screen turn, not the distorted percent-space one
+  const aheadPoint = pointAtY(activePoints, Math.min(100, progress * 100 + 0.6));
+  const dxPx = ((aheadPoint.x - robotPoint.x) / 100) * containerSize.width;
+  const dyPx = ((aheadPoint.y - robotPoint.y) / 100) * containerSize.height;
+  const headingDeg = (Math.atan2(dyPx, dxPx) * 180) / Math.PI;
+
+  const { d: roadPathD, len: roadPathLen } = toPixelPath(
+    activePoints,
+    containerSize.width,
+    containerSize.height
+  );
 
   return (
     <div className="pac-roadmap" ref={roadmapRef}>
-      <div className="road-line"></div>
-      <div className="road-eaten" style={{ height: `${progress * 100}%` }}></div>
+      <svg
+        className="road-svg"
+        width={containerSize.width}
+        height={containerSize.height}
+        viewBox={`0 0 ${containerSize.width} ${containerSize.height}`}
+      >
+        <path d={roadPathD} className="road-line-path" />
+        <path
+          d={roadPathD}
+          className="road-eaten-path"
+          style={{
+            strokeDasharray: roadPathLen,
+            strokeDashoffset: roadPathLen * (1 - progress),
+          }}
+        />
+      </svg>
 
       <div
         className="pac-robot"
-        style={{ top: `${robotTop}px`, "--wobble": `${wobble}px` }}
+        style={{ left: `${robotPoint.x}%`, top: `${robotPoint.y}%`, "--heading": `${headingDeg}deg` }}
       >
         <span className="pac-antenna-light"></span>
         <div className="pac-body"></div>
@@ -151,14 +238,21 @@ export default function PacmanRoadmap() {
       {stops.map((s, i) => {
         const revealed = progress >= s.fraction - 0.04;
         const isCurrent = currentIdx === i;
+        const p = pointAtY(activePoints, s.fraction * 100);
+        const cardStyle = isMobile
+          ? { left: "56px", right: "12px", top: `${p.y}%` }
+          : s.side === "right"
+          ? { left: `calc(${p.x}% + 34px)`, right: "16px", top: `${p.y}%` }
+          : { left: "16px", right: `calc(${100 - p.x}% + 34px)`, top: `${p.y}%` };
+        const pelletStyle = { left: `${p.x}%`, top: `${p.y}%` };
+
         return (
           <div
             key={s.id}
-            className={`pac-stop stop-${s.side}${revealed ? " revealed" : ""}${isCurrent ? " current" : ""}`}
-            style={{ top: `${s.fraction * 100}%` }}
+            className={`pac-stop${revealed ? " revealed" : ""}${isCurrent ? " current" : ""}`}
           >
-            <span className="stop-pellet"></span>
-            <div className="stop-card project">
+            <span className="stop-pellet" style={pelletStyle}></span>
+            <div className="stop-card project" style={cardStyle}>
               <div className="project-top">
                 <span className="project-name">{s.name}</span>
                 <span className="project-tag">{s.tag}</span>

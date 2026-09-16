@@ -1,4 +1,4 @@
-/* ===== Pacman roadmap: scroll-driven robot travelling to 3 project stops ===== */
+/* ===== Pacman roadmap: scroll-driven robot winding through a maze-like road to 3 project stops ===== */
 
 .pac-roadmap {
   position: relative;
@@ -7,44 +7,44 @@
   margin: 10px 0 40px;
 }
 
-/* dotted "pellet" road */
-.road-line {
+/* the winding road, drawn as an SVG path so it can actually turn left/right */
+.road-svg {
   position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  margin-left: -2px;
-  background-image: radial-gradient(circle, rgba(232, 237, 242, 0.32) 2px, transparent 2.4px);
-  background-size: 4px 24px;
-  background-repeat: repeat-y;
-  border-radius: 4px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 1;
+  overflow: visible;
+}
+
+.road-line-path {
+  fill: none;
+  stroke: rgba(232, 237, 242, 0.32);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 0 20;
 }
 
 /* the trail the robot has already "eaten" */
-.road-eaten {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 4px;
-  margin-left: -2px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, var(--accent), rgba(95, 184, 221, 0.15));
-  box-shadow: 0 0 12px rgba(95, 184, 221, 0.55);
-  z-index: 2;
-  transition: height 0.05s linear;
+.road-eaten-path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(95, 184, 221, 0.6));
+  transition: stroke-dashoffset 0.05s linear;
 }
 
 /* ===== Pacman-robot character ===== */
 .pac-robot {
   position: absolute;
-  left: 50%;
   width: 46px;
   height: 46px;
   z-index: 5;
-  transform: translateX(calc(-50% + var(--wobble, 0px)));
-  transition: top 0.08s linear, transform 0.15s ease-out;
+  transform: translate(-50%, -50%);
+  transition: left 0.08s linear, top 0.08s linear;
 }
 
 .pac-body {
@@ -53,7 +53,8 @@
   border-radius: 50%;
   background: radial-gradient(circle at 35% 30%, #fff4c2, var(--accent) 55%, var(--accent-dim) 100%);
   box-shadow: 0 0 18px rgba(95, 184, 221, 0.55), 0 6px 14px rgba(0, 0, 0, 0.45);
-  transform: rotate(90deg);
+  transform: rotate(var(--heading, 90deg));
+  transition: transform 0.15s ease-out;
   animation: chomp 0.42s steps(2) infinite;
 }
 
@@ -115,25 +116,18 @@
 }
 
 /* ===== Stops ===== */
-.pac-stop {
-  position: absolute;
-  left: 0;
-  transform: translateY(-50%);
-  width: 100%;
-  z-index: 3;
-}
+/* .pac-stop is a plain class-carrier (deliberately position:static) —
+   .stop-pellet/.stop-card are absolutely positioned and must escape to
+   .pac-roadmap as their containing block, not stop at this wrapper */
 
 .stop-pellet {
   position: absolute;
-  left: 50%;
-  top: 50%;
   width: 14px;
   height: 14px;
-  margin-left: -7px;
-  margin-top: -7px;
   border-radius: 50%;
   background: var(--panel-2);
   border: 2px solid var(--accent-dim);
+  transform: translate(-50%, -50%);
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
   z-index: 4;
 }
@@ -145,33 +139,22 @@
 }
 
 .pac-stop.current .stop-pellet {
-  transform: scale(1.5);
+  transform: translate(-50%, -50%) scale(1.5);
   box-shadow: 0 0 20px rgba(95, 184, 221, 0.85);
 }
 
 .stop-card {
-  position: relative;
-  width: calc(50% - 60px);
+  position: absolute;
   margin: 0;
+  transform: translateY(-50%);
   opacity: 0;
   filter: blur(6px);
-  transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
-}
-
-.pac-stop.stop-right .stop-card {
-  margin-left: calc(50% + 60px);
-  transform: translateX(24px);
-}
-
-.pac-stop.stop-left .stop-card {
-  margin-left: 0;
-  transform: translateX(-24px);
+  transition: opacity 0.6s ease, filter 0.6s ease;
 }
 
 .pac-stop.revealed .stop-card {
   opacity: 1;
   filter: blur(0);
-  transform: translateX(0);
 }
 
 .pac-stop.current .stop-card {
@@ -301,32 +284,6 @@
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .pac-roadmap {
-    min-height: 2500px;
-  }
-
-  .road-line,
-  .road-eaten,
-  .pac-robot {
-    left: 22px;
-  }
-
-  .pac-robot {
-    transform: translateX(var(--wobble, 0px));
-  }
-
-  .stop-pellet {
-    left: 22px;
-  }
-
-  .stop-card,
-  .pac-stop.stop-right .stop-card,
-  .pac-stop.stop-left .stop-card {
-    width: calc(100% - 70px);
-    margin-left: 60px;
-    transform: translateX(16px);
-  }
-
-  .pac-stop.revealed .stop-card {
-    transform: translateX(0);
+    min-height: 2600px;
   }
 }
