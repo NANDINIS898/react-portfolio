@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { skillGroups } from "./skillData";
+import { typeBurst } from "./sound";
 import "./Skills.css";
 
 const group = (id) => skillGroups.find((g) => g.id === id);
@@ -159,8 +160,14 @@ function ToolNotes({ active, onPing }) {
 export default function Skills() {
   const [ping, setPing] = useState(null);
 
+  // The ref (not state) decides whether this is a new skill, so the sound is
+  // triggered from the event handler rather than from inside a state update.
+  const lastName = useRef(null);
   const onPing = useCallback((groupId, name) => {
-    setPing((prev) => (prev && prev.name === name ? prev : { name, text: group(groupId).status(name) }));
+    if (lastName.current === name) return;
+    lastName.current = name;
+    typeBurst(280);
+    setPing({ name, text: group(groupId).status(name) });
   }, []);
 
   const active = ping ? ping.name : null;

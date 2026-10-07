@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import profileImage from "./nandini.jpeg";
 import { prefersReducedMotion, useInView, usePointerVars, useScrollVar } from "./useY2K";
+import { playKey } from "./sound";
 import "./About.css";
 
 // The About copy, unchanged. `strong` marks the phrase that was bold.
@@ -61,9 +62,14 @@ function Handwritten({ segs, start, onDone }) {
     }
     let raf;
     let t0;
+    let lastKey = 0;
     function tick(t) {
       if (t0 === undefined) t0 = t;
       const next = Math.min(total, Math.floor(((t - t0) / 1000) * WRITE_SPEED));
+      if (next - lastKey >= 4) {
+        lastKey = next;
+        playKey();
+      }
       setCount(next);
       if (next < total) raf = requestAnimationFrame(tick);
       else onDoneRef.current && onDoneRef.current();

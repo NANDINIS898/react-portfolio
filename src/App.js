@@ -10,6 +10,7 @@ import Contact from "./Contact";
 import Hero from "./Hero";
 import About from "./About";
 import { useClock } from "./useY2K";
+import { useClickSounds, useSoundSetting } from "./sound";
 
 // The Experience section and its link exist only while experience.js has entries.
 const hasExperience = experience.length > 0;
@@ -43,6 +44,7 @@ const sectionNum = (n) => String(n + (hasExperience ? 1 : 0)).padStart(2, "0");
 function Nav() {
   const [open, setOpen] = useState(false);
   const time = useClock();
+  const [soundOn, setSoundOn] = useSoundSetting();
 
   return (
     <nav className={"nav" + (open ? " is-open" : "")} aria-label="Primary">
@@ -68,6 +70,17 @@ function Nav() {
         ))}
       </div>
 
+      <button
+        type="button"
+        className="nav-sound"
+        aria-pressed={soundOn}
+        aria-label="Sound effects"
+        title={soundOn ? "Sound effects: on" : "Sound effects: off"}
+        onClick={() => setSoundOn(!soundOn)}
+      >
+        <span aria-hidden="true">♪</span> {soundOn ? "on" : "off"}
+      </button>
+
       <div className="nav-tray" aria-hidden="true">
         <span className="status-dot"></span>
         <span>online</span>
@@ -78,6 +91,8 @@ function Nav() {
 }
 
 function App() {
+  useClickSounds();
+
   return (
     <div className="app">
       <Nav />

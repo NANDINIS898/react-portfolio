@@ -197,6 +197,34 @@ a, button {
   50%{ transform:translateX(2px); }
 }
 
+/* sound switch: pressed-in while sound is on */
+.nav-sound{
+  padding:6px 9px;
+  font-family:var(--font-mono);
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  color:var(--ink);
+  cursor:pointer;
+  background:var(--grey-soft);
+  border:1.5px solid var(--ink);
+  box-shadow:inset -2px -2px 0 #a3a5ae, inset 2px 2px 0 #fff;
+  transition:none;
+}
+
+.nav-sound[aria-pressed="true"]{
+  color:#fff;
+  background:var(--blue);
+  box-shadow:inset 2px 2px 0 #1228b8;
+}
+
+.nav-sound:hover{
+  background:var(--pink);
+  color:var(--ink);
+}
+
 .nav-tray{
   display:flex;
   align-items:center;

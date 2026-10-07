@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
 import { projects, screenLines } from "./projects";
 import { prefersReducedMotion, useInView } from "./useY2K";
+import { typeBurst } from "./sound";
 import "./ProjectLab.css";
 
 const FILTERS = [
@@ -246,8 +247,13 @@ function ExpandedProject({ project, index, total, onClose, onNav }) {
     setTimeout(onClose, 380);
   }, [flip, onClose, project.id]);
 
-  // A new project always opens on its first page.
-  useEffect(() => setView("overview"), [project.id]);
+  // A new project always opens on its first page, and its boot log types
+  // out loud for as long as it is on screen.
+  useEffect(() => {
+    setView("overview");
+    if (prefersReducedMotion()) return;
+    return typeBurst(800);
+  }, [project.id]);
 
   // Modal behaviour: lock page scroll, take focus, and hand it back to the
   // machine that is showing when the dialog goes away.
