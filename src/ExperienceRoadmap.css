@@ -1,0 +1,441 @@
+/* ===== Experience roadmap: a road that draws itself, with a checkpoint per role ===== */
+
+.xr-wrap {
+  position: relative;
+}
+
+/* START / end-of-road markers */
+.xr-cap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.xr-flag {
+  padding: 6px 16px 7px;
+  font-family: var(--font-pixel);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: inset -2px -2px 0 #3a3b45, inset 2px 2px 0 #6a6c78, 4px 4px 0 var(--blue);
+}
+
+.xr-cap-note {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.xr-cap-start {
+  flex-direction: column-reverse;
+}
+
+.xr-cap-end .xr-flag {
+  color: var(--ink);
+  background: var(--grey-soft);
+  box-shadow: inset -2px -2px 0 #a3a5ae, inset 2px 2px 0 #fff, 4px 4px 0 var(--grey);
+  transition: background 0.2s steps(2), box-shadow 0.2s steps(2);
+}
+
+.xr-cap-end.is-reached .xr-flag {
+  background: var(--pink);
+  box-shadow: inset -2px -2px 0 #c92d7c, inset 2px 2px 0 #ffb0d6, 4px 4px 0 var(--ink);
+  animation: xrBlink 1.2s steps(1) infinite;
+}
+
+@keyframes xrBlink {
+  50% { background: #fff; }
+}
+
+.xr-dots::after {
+  content: "";
+  animation: xrDots 1.6s steps(1) infinite;
+}
+
+@keyframes xrDots {
+  0% { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
+}
+
+/* ---------- the road ---------- */
+.xr {
+  position: relative;
+}
+
+.xr-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.xr-road-ghost,
+.xr-road,
+.xr-road-dash {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the route still ahead: a faint dotted guide */
+.xr-road-ghost {
+  stroke: var(--grey);
+  stroke-width: 3;
+  stroke-dasharray: 0 12;
+}
+
+/* the route already driven: tarmac with a dashed centre line */
+.xr-road {
+  stroke: var(--ink);
+  stroke-width: 20;
+}
+
+.xr-road-dash {
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-dasharray: 10 12;
+  stroke-linecap: butt;
+}
+
+.xr-link-line {
+  stroke: var(--grey);
+  stroke-width: 2;
+  stroke-dasharray: 4 5;
+  transition: stroke 0.3s ease;
+}
+
+.xr-link-line.is-reached {
+  stroke: var(--blue);
+}
+
+/* map pin; its tip sits exactly on the road */
+.xr-pin {
+  position: absolute;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  margin: -39px 0 0 -15px;
+  background: var(--grey);
+  border: 3px solid var(--ink);
+  border-radius: 50% 50% 50% 0;
+  box-shadow: inset 0 0 0 5px var(--grey), inset 0 0 0 20px #fff;
+  transform: rotate(-45deg) scale(0.8);
+  transition: transform 0.25s cubic-bezier(0.3, 1.6, 0.5, 1), background 0.2s, box-shadow 0.2s;
+}
+
+.xr-pin.is-reached {
+  background: var(--ink);
+  box-shadow: inset 0 0 0 5px var(--ink), inset 0 0 0 20px #fffaf0;
+  transform: rotate(-45deg) scale(1);
+}
+
+.xr-pin.is-reached.is-selected {
+  transform: rotate(-45deg) scale(1.2);
+}
+
+.xr-pin.is-reached.is-current {
+  background: var(--pink);
+  box-shadow: inset 0 0 0 5px var(--pink), inset 0 0 0 20px #fff;
+  animation: xrPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes xrPulse {
+  50% { transform: rotate(-45deg) scale(1.22); }
+}
+
+/* the cursor driving the road */
+.xr-traveller {
+  position: absolute;
+  z-index: 3;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  transform: rotate(var(--angle, 0deg));
+  pointer-events: none;
+}
+
+.xr-traveller svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: xrBob 0.5s steps(2) infinite;
+}
+
+@keyframes xrBob {
+  50% { transform: translateY(2px); }
+}
+
+/* ---------- stops ---------- */
+.xr-stops {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 64px;
+  padding: 76px 0 96px;
+  list-style: none;
+}
+
+.xr-stop {
+  display: grid;
+  grid-template-columns: 46% 8% 46%;
+}
+
+.xr-left .xr-card { grid-column: 1; }
+.xr-right .xr-card { grid-column: 3; }
+
+.xr-card {
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  opacity: 0;
+  transform: translateX(-26px);
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.15s steps(2);
+}
+
+.xr-right .xr-card {
+  transform: translateX(26px);
+}
+
+.xr-stop.is-reached .xr-card {
+  opacity: 1;
+  transform: none;
+}
+
+.xr-stop.is-selected .xr-card {
+  box-shadow: 7px 7px 0 var(--blue);
+}
+
+.xr-stop.is-current.is-selected .xr-card {
+  box-shadow: 7px 7px 0 var(--ink);
+}
+
+.xr-card-head {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 0 0 14px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  transition: none;
+}
+
+.xr-card-head > span:not(.xr-card-bar) {
+  padding: 0 16px;
+}
+
+.xr-card-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  padding: 4px 8px 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--grey-soft);
+  border-bottom: 2px solid var(--ink);
+}
+
+.xr-stop.is-selected .xr-card-bar {
+  color: #fff;
+  background: var(--blue);
+}
+
+.xr-stop.is-current.is-selected .xr-card-bar {
+  color: var(--ink);
+  background: var(--pink);
+}
+
+.xr-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  animation: caretBlink 1.4s steps(1) infinite;
+}
+
+.xr-role {
+  font-family: var(--font-pixel);
+  font-size: clamp(20px, 2.3vw, 26px);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+/* a quick terminal glitch when a card is pointed at */
+.xr-card-head:hover .xr-role,
+.xr-card-head:focus-visible .xr-role {
+  text-shadow: -2px 0 0 var(--pink), 2px 0 0 var(--blue);
+  animation: navNudge 0.18s steps(2);
+}
+
+.xr-company {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.xr-dates {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.xr-toggle {
+  margin-top: 6px;
+  font-family: var(--font-term);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--blue);
+}
+
+.xr-panel {
+  padding: 14px 16px 18px;
+  border-top: 2px dashed var(--grey);
+  animation: xrPanel 0.3s ease both;
+}
+
+@keyframes xrPanel {
+  from { opacity: 0; transform: translateY(-6px); }
+}
+
+.xr-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+
+.xr-wins {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.xr-wins li {
+  position: relative;
+  padding-left: 22px;
+}
+
+.xr-wins li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  color: var(--blue);
+}
+
+.xr-tech {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+  list-style: none;
+}
+
+.xr-tech li {
+  padding: 3px 8px 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--grey-soft);
+  border: 1.5px solid var(--ink);
+}
+
+.xr-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- narrow: the road runs straight down the left edge ---------- */
+.xr.is-mobile .xr-stops {
+  gap: 44px;
+  padding: 64px 0 80px;
+}
+
+.xr.is-mobile .xr-stop {
+  display: block;
+  padding-left: 48px;
+}
+
+.xr.is-mobile .xr-card,
+.xr.is-mobile .xr-right .xr-card {
+  transform: translateX(18px);
+}
+
+.xr.is-mobile .xr-stop.is-reached .xr-card {
+  transform: none;
+}
+
+.xr.is-mobile .xr-road {
+  stroke-width: 12;
+}
+
+.xr.is-mobile .xr-pin {
+  width: 24px;
+  height: 24px;
+  margin: -32px 0 0 -12px;
+}
+
+.xr.is-mobile .xr-traveller {
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+}
+
+/* matches the roadmap's own switch (container narrower than 720px) */
+@media (max-width: 799px) {
+  .xr-cap {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xr-card,
+  .xr-right .xr-card,
+  .xr.is-mobile .xr-card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .xr-traveller {
+    display: none;
+  }
+
+  .xr-pin.is-reached.is-current,
+  .xr-cap-end.is-reached .xr-flag,
+  .xr-now,
+  .xr-dots::after,
+  .xr-panel,
+  .xr-card-head:hover .xr-role {
+    animation: none;
+  }
+}

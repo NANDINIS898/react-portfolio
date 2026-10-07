@@ -20,7 +20,7 @@ import "./Animatedheadline.css";
  * `break: true` forces a line break after that part (use on its own with
  * empty text, or attach to the last word before the break).
  */
-export default function AnimatedHeadline({ parts, className = "hero-title", baseDelay = 0, stagger = 70 }) {
+export default function AnimatedHeadline({ parts, className = "hero-title", baseDelay = 0, stagger = 70, as: Tag = "h1" }) {
   // flatten parts into individual word tokens, tracking em/break state
   const tokens = [];
   parts.forEach((part) => {
@@ -38,7 +38,7 @@ export default function AnimatedHeadline({ parts, className = "hero-title", base
   let wordIndex = 0;
 
   return (
-    <h1 className={className + " animated-headline"}>
+    <Tag className={className + " animated-headline"}>
       {tokens.map((t, i) => {
         const delay = baseDelay + wordIndex * stagger;
         wordIndex++;
@@ -59,6 +59,6 @@ export default function AnimatedHeadline({ parts, className = "hero-title", base
           </React.Fragment>
         );
       })}
-    </h1>
+    </Tag>
   );
 }
