@@ -1,0 +1,193 @@
+/* ===== Act III: debugging + the stack branching out of her head ===== */
+.dbg{
+  position:relative;
+  height:220vh;
+  background:
+    radial-gradient(ellipse 60% 50% at 40% 70%, rgba(47,123,255,0.22), transparent 70%),
+    linear-gradient(180deg, #02040c, #050f2b 50%, #02040c);
+}
+.dbg-sticky{
+  position:sticky;
+  top:0;
+  height:100vh;
+  min-height:620px;
+  overflow:hidden;
+}
+.dbg-canvas{
+  position:absolute;
+  inset:0;
+}
+.dbg-fallback{
+  display:grid;
+  place-items:center;
+  height:100%;
+  font-family:var(--font-term);
+  font-size:40px;
+  color:var(--sky);
+}
+
+.dbg-head{
+  position:absolute;
+  left:clamp(16px, 4vw, 56px);
+  bottom:76px;
+  pointer-events:none;
+  z-index:2;
+}
+.dbg-act{
+  font-family:var(--font-term);
+  font-size:20px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--sky);
+}
+.dbg-title{
+  font-family:var(--font-pixel);
+  font-weight:700;
+  font-size:clamp(26px, 4vw, 52px);
+  line-height:1;
+  color:#fff;
+  max-width:12ch;
+  text-shadow:0 0 22px rgba(111,227,255,0.6), 3px 3px 0 var(--azure);
+}
+
+/* branches: drawn from her head up to each card */
+.dbg-branches{
+  position:absolute;
+  left:0;
+  top:0;
+  pointer-events:none;
+  overflow:visible;
+}
+.dbg-branch-line{
+  fill:none;
+  stroke:var(--sky);
+  stroke-width:2;
+  stroke-dasharray:1;
+  stroke-dashoffset:1;
+  opacity:0.7;
+  filter:drop-shadow(0 0 4px rgba(111,227,255,0.8));
+  transition:stroke-dashoffset 0.9s cubic-bezier(.4,0,.2,1);
+}
+.dbg-branch.is-on .dbg-branch-line{ stroke-dashoffset:0; }
+.dbg-branch-pulse{
+  fill:none;
+  stroke:#ffffff;
+  stroke-width:4;
+  stroke-linecap:round;
+  stroke-dasharray:0.03 0.97;
+  stroke-dashoffset:1;
+  opacity:0;
+  filter:drop-shadow(0 0 6px #fff);
+}
+.dbg-branch.is-on .dbg-branch-pulse{
+  opacity:1;
+  animation:dbgPulse 2.2s linear infinite;
+}
+@keyframes dbgPulse{ to{ stroke-dashoffset:0; } }
+.dbg-mind{
+  fill:#fff;
+  filter:drop-shadow(0 0 8px var(--sky));
+  animation:dbgMind 1.4s ease-in-out infinite;
+  transform-box:fill-box;
+  transform-origin:center;
+}
+@keyframes dbgMind{ 50%{ transform:scale(1.6); } }
+
+/* tech nodes */
+.dbg-nodes{
+  list-style:none;
+}
+.dbg-node{
+  position:absolute;
+  left:var(--x);
+  top:calc(var(--y) + 84px);
+  translate:-50% 0;
+  width:min(17.5vw, 236px);
+  padding:10px 11px 11px;
+  background:linear-gradient(160deg, rgba(10,28,72,0.94), rgba(3,8,22,0.94));
+  border:1.5px solid rgba(111,227,255,0.55);
+  box-shadow:4px 4px 0 rgba(47,123,255,0.6), 0 0 26px rgba(111,227,255,0.18);
+  opacity:0;
+  scale:0.3;
+  transform-origin:50% 100%;
+  transition:opacity 0.4s ease 0.45s, scale 0.6s cubic-bezier(.2,1.6,.4,1) 0.45s;
+  z-index:2;
+}
+.dbg-node.is-on{
+  opacity:1;
+  scale:1;
+}
+.dbg-node-label{
+  display:block;
+  margin-bottom:7px;
+  font-family:var(--font-pixel);
+  font-weight:700;
+  font-size:17px;
+  color:var(--sky);
+  text-transform:uppercase;
+  letter-spacing:0.02em;
+}
+.dbg-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+.dbg-chip{
+  font-family:var(--font-mono);
+  font-size:11px;
+  padding:3px 7px;
+  color:#dff3ff;
+  background:rgba(47,123,255,0.16);
+  border:1px solid rgba(111,227,255,0.4);
+  cursor:default;
+}
+.dbg-chip:hover, .dbg-chip:focus-visible{
+  color:#02040c;
+  background:var(--sky);
+  box-shadow:0 0 12px var(--sky);
+}
+
+.dbg-status{
+  position:absolute;
+  right:clamp(16px, 4vw, 56px);
+  bottom:28px;
+  max-width:calc(100% - 32px);
+  padding:8px 12px;
+  font-family:var(--font-term);
+  font-size:20px;
+  color:#7dffb0;
+  background:rgba(2,6,18,0.8);
+  border:1px solid rgba(111,227,255,0.45);
+  z-index:2;
+}
+.dbg-caret{ margin-left:4px; animation:phBlink 1s steps(2) infinite; }
+
+/* narrow: nodes become a compact stack on top, no branch lines */
+@media (max-width: 900px){
+  .dbg{ height:auto; }
+  .dbg-sticky{
+    position:relative;
+    height:auto;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    padding:84px 16px 24px;
+  }
+  .dbg-branches{ display:none; }
+  .dbg-head{ position:static; order:-1; margin-bottom:14px; }
+  .dbg-nodes{ display:grid; gap:10px; }
+  .dbg-node{
+    position:static;
+    translate:none;
+    width:auto;
+    opacity:1;
+    scale:1;
+  }
+  .dbg-canvas{
+    position:relative;
+    height:58vh;
+    min-height:340px;
+    order:2;
+  }
+  .dbg-status{ position:static; order:3; margin-top:8px; font-size:17px; }
+}

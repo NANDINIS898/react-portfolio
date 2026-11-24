@@ -1,0 +1,99 @@
+/* The minifigure: idles on its own, strides under any `.is-walking` ancestor. */
+.lego{
+  display:block;
+  overflow:visible;
+  --stride:.8s;
+}
+
+.lego path,
+.lego rect,
+.lego circle:not(.lego-hand-hole){
+  stroke:#140c24;
+  stroke-width:1.1;
+  stroke-linejoin:round;
+}
+.lego .lego-face *{ stroke:none; }
+
+.lego-shadow{ fill:rgba(5,3,20,.45); stroke:none; }
+.lego-hand-hole{ fill:#3a1e1a; }
+.lego .lego-brow{ fill:none; stroke:#1a0f14; stroke-width:1.5; stroke-linecap:round; }
+.lego .lego-lash{ fill:none; stroke:#140c18; stroke-width:1.1; stroke-linecap:round; }
+.lego .lego-chain{ fill:none; stroke:#cfd3dc; stroke-width:.8; }
+.lego .lego-cross{ fill:none; stroke:#e6e9f0; stroke-width:1.7; stroke-linecap:round; }
+.lego .lego-part{ fill:none; stroke:#3d3046; stroke-width:.9; }
+.lego-print{
+  font-family:'Parisienne', cursive;
+  font-size:10px;
+  fill:#f2e6cf;
+  stroke:none;
+}
+
+.lego-leg,
+.lego-arm,
+.lego-lock,
+.lego-eyes,
+.lego-body,
+.lego-head{
+  transform-box:fill-box;
+}
+.lego-leg{ transform-origin:50% 0; }
+.lego-arm-l{ transform-origin:66% 6%; }
+.lego-arm-r{ transform-origin:34% 6%; }
+.lego-lock{ transform-origin:50% 0; }
+.lego-eyes{ transform-origin:50% 50%; }
+.lego-head{ transform-origin:50% 100%; }
+
+/* idle: blink, a slow breath, hair drifting */
+.lego-eyes{ animation:legoBlink 4.2s infinite; }
+.lego-body{ animation:legoBreathe 2.6s ease-in-out infinite; transform-origin:50% 100%; }
+.lego-lock-l{ animation:legoSway 3.2s ease-in-out infinite; }
+.lego-lock-r{ animation:legoSway 3.2s ease-in-out infinite reverse; }
+.lego-head{ animation:legoLook 5.5s ease-in-out infinite; }
+
+@keyframes legoBlink{
+  0%, 92%, 100%{ transform:scaleY(1); }
+  95%{ transform:scaleY(.1); }
+}
+@keyframes legoBreathe{
+  0%, 100%{ transform:translateY(0); }
+  50%{ transform:translateY(-.8px); }
+}
+@keyframes legoSway{
+  0%, 100%{ transform:rotate(-1.5deg); }
+  50%{ transform:rotate(1.5deg); }
+}
+@keyframes legoLook{
+  0%, 100%{ transform:rotate(0); }
+  30%{ transform:rotate(-3deg); }
+  65%{ transform:rotate(2.5deg); }
+}
+
+/* walking: legs scissor from the hip, arms swing opposite, the body bobs */
+.is-walking .lego-leg-l{ animation:legoLeg var(--stride) ease-in-out infinite; }
+.is-walking .lego-leg-r{ animation:legoLeg var(--stride) ease-in-out infinite; animation-delay:calc(var(--stride) / -2); }
+.is-walking .lego-arm-l{ animation:legoArmL var(--stride) ease-in-out infinite; animation-delay:calc(var(--stride) / -2); }
+.is-walking .lego-arm-r{ animation:legoArmR var(--stride) ease-in-out infinite; }
+.is-walking .lego-body{ animation:legoBob calc(var(--stride) / 2) ease-in-out infinite alternate; }
+.is-walking .lego-lock-l,
+.is-walking .lego-lock-r{ animation:legoSway calc(var(--stride) / 2) ease-in-out infinite alternate; }
+
+@keyframes legoLeg{
+  0%, 100%{ transform:scaleY(1) skewX(0); }
+  50%{ transform:scaleY(.8) skewX(-6deg); }
+}
+@keyframes legoArmL{
+  0%, 100%{ transform:rotate(14deg); }
+  50%{ transform:rotate(-12deg); }
+}
+@keyframes legoArmR{
+  0%, 100%{ transform:rotate(-14deg); }
+  50%{ transform:rotate(12deg); }
+}
+@keyframes legoBob{
+  from{ transform:translateY(0); }
+  to{ transform:translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .lego *, .is-walking .lego *{ animation:none !important; }
+}

@@ -1,0 +1,30 @@
+{
+  "aspect": 0.6283,
+  "strips": [
+    {
+      "name": "head",
+      "rect": [
+        0.06,
+        0.25,
+        0.86,
+        0.38
+      ]
+    },
+    {
+      "name": "shoulder",
+      "rect": [
+        0.2,
+        0.55,
+        0.78,
+        0.69
+      ]
+    }
+  ],
+  "filters": [
+    "hrx",
+    "blue",
+    "pop",
+    "lime"
+  ],
+  "source": "stage photo (from behind)"
+}

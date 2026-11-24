@@ -5,93 +5,43 @@ import "./Contact.css";
 
 const EMAIL = "nandinis898@gmail.com";
 
-// The places to reach me, as they were on the old contact row.
 const LINKS = [
-  { label: "GitHub", href: "https://github.com/NANDINIS898", Icon: FaGithub },
-  { label: "LeetCode", href: "https://leetcode.com/u/nandiiinigangwar/", Icon: SiLeetcode },
-  { label: "LinkedIn", href: "https://www.linkedin.com/in/nandini-gangwar-b47987213/", Icon: FaLinkedin },
+  { label: "Email", value: EMAIL, href: `mailto:${EMAIL}`, Icon: FaEnvelope },
+  { label: "GitHub", value: "NANDINIS898", href: "https://github.com/NANDINIS898", Icon: FaGithub },
+  { label: "LeetCode", value: "nandiiinigangwar", href: "https://leetcode.com/u/nandiiinigangwar/", Icon: SiLeetcode },
+  { label: "LinkedIn", value: "nandini-gangwar", href: "https://www.linkedin.com/in/nandini-gangwar-b47987213/", Icon: FaLinkedin },
 ];
 
-/**
- * The last screen: an email window already addressed, and a terminal that
- * has "dialled" every other place to find me. Both are plain links — there
- * is no form here to pretend to send anything.
- */
+/** The closing page: one line of intent, then every way to reach her. */
 export default function Contact() {
   return (
     <section className="contact" id="contact">
-      <p className="contact-kicker">
-        <span className="status-dot"></span> connection established <span>{"//"}</span> end of line
-      </p>
+      <div className="contact-head">
+        <span className="section-num">02</span>
+        <span className="contact-kicker">Contact</span>
+        <span className="section-line"></span>
+      </div>
 
       <h2 className="contact-title">
-        Let’s build <span className="accent">something.</span>
+        Let’s build <em>something.</em>
       </h2>
+      <p className="contact-lede">Open to internships and roles in SDE, AI/ML and GenAI.</p>
 
-      <div className="contact-grid">
-        <div className="win contact-mail">
-          <div className="win-bar">
-            <span>new_message.eml</span>
-            <span className="win-ctrl" aria-hidden="true">
-              <i></i>
-              <i></i>
-              <i></i>
-            </span>
-          </div>
-
-          <dl className="mail-fields">
-            <div>
-              <dt>to</dt>
-              <dd>
-                <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-              </dd>
-            </div>
-            <div>
-              <dt>from</dt>
-              <dd className="mail-you">
-                you<span className="caret" aria-hidden="true"></span>
-              </dd>
-            </div>
-          </dl>
-
-          <p className="mail-body">Open to internships and roles in SDE, AI/ML and GenAI.</p>
-
-          <div className="mail-actions">
-            <a href={`mailto:${EMAIL}`} className="btn98 btn98-primary mail-send">
-              <FaEnvelope /> Email
+      <ul className="contact-list">
+        {LINKS.map(({ label, value, href, Icon }) => (
+          <li key={label}>
+            <a href={href} {...(href.startsWith("mailto:") ? {} : { target: "_blank", rel: "noreferrer" })}>
+              <span className="contact-label">
+                <Icon aria-hidden="true" /> {label}
+              </span>
+              <span className="contact-value">{value}</span>
+              <span className="contact-arrow" aria-hidden="true">
+                ↗
+              </span>
             </a>
-            <span className="mail-hint" aria-hidden="true">
-              opens your mail app
-            </span>
-          </div>
-        </div>
-
-        <div className="contact-dial">
-          <div className="dial-bar">
-            <span>dial-up.exe</span>
-            <span className="dial-online">
-              <span className="status-dot"></span> online
-            </span>
-          </div>
-          <ul className="dial-list">
-            {LINKS.map(({ label, href, Icon }) => (
-              <li key={label}>
-                <a href={href} target="_blank" rel="noreferrer">
-                  <Icon aria-hidden="true" />
-                  <span className="dial-name">{label}</span>
-                  <span className="dial-dots" aria-hidden="true"></span>
-                  <span className="dial-go" aria-hidden="true">
-                    open ↗
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-          <p className="dial-foot" aria-hidden="true">
-            &gt; {LINKS.length + 1} lines open<span className="dial-cursor">_</span>
-          </p>
-        </div>
-      </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

@@ -1,26 +1,24 @@
 import React, { useState } from "react";
 import "./App.css";
-import tensorflowCert from "./deeplearning.png";
-import genaiCert from "./genai_simulation.png";
-import ProjectLab from "./ProjectLab";
-import ExperienceRoadmap from "./ExperienceRoadmap";
+import ExperienceSky from "./ExperienceSky";
 import { experience } from "./experience";
-import Skills from "./Skills";
 import Contact from "./Contact";
-import Hero from "./Hero";
-import About from "./About";
-import { useClock } from "./useY2K";
+import PersonaHero from "./PersonaHero";
+import StageScene from "./StageScene";
+import DebugScene from "./DebugScene";
+import ProjectRoad from "./ProjectRoad";
 import { useClickSounds, useSoundSetting } from "./sound";
+import { useScrollReveals } from "./motion";
 
 // The Experience section and its link exist only while experience.js has entries.
 const hasExperience = experience.length > 0;
 
 const navLinks = [
-  { href: "#home", label: "home" },
-  { href: "#about", label: "about" },
-  ...(hasExperience ? [{ href: "#experience", label: "experience" }] : []),
+  { href: "#stage", label: "stage" },
+  { href: "#home", label: "personas" },
+  { href: "#tech-stack", label: "stack" },
+  ...(hasExperience ? [{ href: "#experience", label: "journey" }] : []),
   { href: "#projects", label: "projects" },
-  { href: "#tech-stack", label: "skills" },
   { href: "#achievements", label: "awards" },
   { href: "#contact", label: "contact" },
 ];
@@ -31,25 +29,19 @@ const achievements = [
   { event: "ABES Hacknovate 6.0", result: "3rd Place" },
 ];
 
-const certifications = [
-  { title: "Deep Learning with TensorFlow 2.0", issuer: "365 Careers · July 2025", image: tensorflowCert },
-  { title: "GenAI-Powered Analytics Simulation", issuer: "Tata & Forage · July 2025", image: genaiCert },
-];
+// Section numbers for the closing chapters.
+const sectionNum = (n) => String(n).padStart(2, "0");
 
-// Section numbers follow About (01); they shift by one when Experience is shown.
-const sectionNum = (n) => String(n + (hasExperience ? 1 : 0)).padStart(2, "0");
-
-// Floating taskbar. Below 1100px the links fold into a MENU dropdown that
+// Floating nav pill. Below 1000px the links fold into a MENU dropdown that
 // closes as soon as one is chosen.
 function Nav() {
   const [open, setOpen] = useState(false);
-  const time = useClock();
   const [soundOn, setSoundOn] = useSoundSetting();
 
   return (
     <nav className={"nav" + (open ? " is-open" : "")} aria-label="Primary">
-      <a href="#home" className="nav-mark">
-        N.G<span>/ portfolio</span>
+      <a href="#stage" className="nav-mark">
+        Nandini<span>portfolio</span>
       </a>
 
       <button
@@ -80,115 +72,47 @@ function Nav() {
       >
         <span aria-hidden="true">♪</span> {soundOn ? "on" : "off"}
       </button>
-
-      <div className="nav-tray" aria-hidden="true">
-        <span className="status-dot"></span>
-        <span>online</span>
-        <span className="nav-clock">{time}</span>
-      </div>
     </nav>
   );
 }
 
 function App() {
   useClickSounds();
+  useScrollReveals();
 
   return (
     <div className="app">
       <Nav />
-      <Hero />
-
       <main>
-        <div className="wrap">
-          <About />
-        </div>
+        <StageScene />
+        <PersonaHero />
+        <DebugScene />
+        {hasExperience && <ExperienceSky items={experience} />}
+        <ProjectRoad />
 
-        {/* Everything after About sits on the beige desk: black and cream,
-            with pink and blue only as small accents. */}
         <div className="beige">
           <div className="wrap">
-            {/* EXPERIENCE */}
-            {hasExperience && (
-              <section className="section" id="experience">
-                <div className="section-head">
-                  <span className="section-num">02</span>
-                  <span className="section-title">Build Journey</span>
-                  <span className="section-line"></span>
-                </div>
-
-                <ExperienceRoadmap items={experience} />
-              </section>
-            )}
-
-            {/* PROJECTS */}
-            <section className="section" id="projects">
+            {/* AWARDS */}
+            <section className="section awards" id="achievements">
               <div className="section-head">
-                <span className="section-num">{sectionNum(2)}</span>
-                <span className="section-title">Project Lab</span>
+                <span className="section-num">{sectionNum(1)}</span>
+                <span className="section-title">Awards</span>
                 <span className="section-line"></span>
               </div>
 
-              <ProjectLab />
-            </section>
+              <h2 className="awards-title">
+                Built under <em>pressure,</em> recognised for it.
+              </h2>
 
-            {/* SKILLS */}
-            <section className="section" id="tech-stack">
-              <div className="section-head">
-                <span className="section-num">{sectionNum(3)}</span>
-                <span className="section-title">Tech Stack</span>
-                <span className="section-line"></span>
-              </div>
-
-              <Skills />
-            </section>
-
-            {/* AWARDS + CERTIFICATES */}
-            <section className="section" id="achievements">
-              <div className="section-head">
-                <span className="section-num">{sectionNum(4)}</span>
-                <span className="section-title">Awards & Certs</span>
-                <span className="section-line"></span>
-              </div>
-
-              <p className="room-label">
-                <b>shelf_01</b> hackathons
-              </p>
-              <ul className="trophy-row">
-                {achievements.map((a) => (
-                  <li className="trophy" key={a.event}>
-                    <svg className="trophy-star" viewBox="0 0 9 9" shapeRendering="crispEdges" aria-hidden="true">
-                        <path d="M4 0h1v3h1v1h3v1H6v1H5v3H4V6H3V5H0V4h3V3h1z" fill="currentColor" />
-                      </svg>
-                    <div className="trophy-cup">
-                      <span className="trophy-result">{a.result}</span>
-                    </div>
-                    <div className="trophy-stem" aria-hidden="true"></div>
-                    <div className="trophy-base">{a.event}</div>
+              <ol className="awards-list">
+                {achievements.map((a, i) => (
+                  <li key={a.event}>
+                    <span className="awards-n">{sectionNum(i + 1)}</span>
+                    <span className="awards-event">{a.event}</span>
+                    <span className="awards-result">{a.result}</span>
                   </li>
                 ))}
-              </ul>
-              <div className="room-shelf" aria-hidden="true"></div>
-
-              <p className="room-label" id="certifications">
-                <b>wall_02</b> certificates
-              </p>
-              <ul className="cert-wall">
-                {certifications.map((c) => (
-                  <li className="cert-hang" key={c.title} tabIndex={0}>
-                    <span className="cert-string" aria-hidden="true"></span>
-                    <figure className="cert-frame">
-                      <img src={c.image} alt={`${c.title} certificate`} />
-                      <span className="cert-stamp" aria-hidden="true">
-                        certified ✓
-                      </span>
-                      <figcaption className="cert-plate">
-                        <h3>{c.title}</h3>
-                        <p>{c.issuer}</p>
-                      </figcaption>
-                    </figure>
-                  </li>
-                ))}
-              </ul>
+              </ol>
             </section>
 
             <Contact />
@@ -198,10 +122,9 @@ function App() {
 
       <footer className="site-footer">
         <span>© 2026 Nandini Gangwar</span>
-        <span className="footer-mid">built by nandini G.</span>
         <span>
-          <span className="status-dot"></span> system online
-          <a href="#home">top ↑</a>
+          designed &amp; built by Nandini
+          <a href="#stage">back to top ↑</a>
         </span>
       </footer>
     </div>

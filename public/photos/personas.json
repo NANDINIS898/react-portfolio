@@ -1,0 +1,65 @@
+{
+  "aspect": 0.6283,
+  "personas": {
+    "builder": {
+      "photo": "p03",
+      "filter": "hrx",
+      "strip": [
+        0.198,
+        0.209,
+        0.808,
+        0.299
+      ]
+    },
+    "debugger": {
+      "photo": "p06",
+      "filter": "violet",
+      "strip": [
+        0.221,
+        0.209,
+        0.804,
+        0.299
+      ]
+    },
+    "performer": {
+      "photo": "p13",
+      "filter": "pop",
+      "strip": [
+        0.137,
+        0.209,
+        0.867,
+        0.299
+      ]
+    },
+    "creator": {
+      "photo": "p09",
+      "filter": "lime",
+      "strip": [
+        0.211,
+        0.209,
+        0.82,
+        0.299
+      ]
+    },
+    "dancer": {
+      "photo": "p12",
+      "filter": "hrx",
+      "strip": [
+        0.211,
+        0.209,
+        0.814,
+        0.299
+      ]
+    },
+    "filmmaker": {
+      "photo": "p10",
+      "filter": "violet",
+      "strip": [
+        0.142,
+        0.209,
+        0.873,
+        0.299
+      ]
+    }
+  }
+}
