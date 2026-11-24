@@ -35,7 +35,7 @@ const ENTRIES = [
 const STATS = [
   { label: "Hackathon wins", val: "3" },
   { label: "Major AI Projects", val: "3" },
-  { label: "LeetCode", val: "400+" },
+  { label: "LeetCode", val: "500+" },
   { label: "Target", val: "SDE + AI" },
 ];
 
